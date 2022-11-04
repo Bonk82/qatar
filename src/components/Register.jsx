@@ -36,7 +36,7 @@ export const Register = () => {
       email: data.get('email'),
       password: data.get('password'),
     });
-    crearUsuario(data.email,data.password);
+    crearUsuario(data.get('email'),data.get('password'));
   };
 
   return (
