@@ -14,11 +14,11 @@ export function AuthProvider({children}) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const signup = (email,password)=> createUserWithEmailAndPassword(auth, email, password);
-  
+  const registro = (email,password)=> createUserWithEmailAndPassword(auth, email, password);
+
   const login = (email, password) => signInWithEmailAndPassword(auth, email, password);
 
-  const loginWithGoogle = () => {
+  const loginGoogle = () => {
     const googleProvider = new GoogleAuthProvider();
     return signInWithPopup(auth, googleProvider);
   };
@@ -29,7 +29,7 @@ export function AuthProvider({children}) {
 
   useEffect(() => {
     const unsubuscribe = onAuthStateChanged(auth, (currentUser) => {
-      // console.log({ currentUser });
+      console.log({ currentUser });
       setUser(currentUser);
       setLoading(false);
     });
@@ -37,6 +37,6 @@ export function AuthProvider({children}) {
   }, []);
 
   return (
-    <authContext.Provider value={{signup,login,user,logout,loading,loginWithGoogle,resetPassword,}}>{children}</authContext.Provider>
+    <authContext.Provider value={{signup: registro,login,user,logout,loading,loginWithGoogle: loginGoogle,resetPassword,}}>{children}</authContext.Provider>
   )
 }

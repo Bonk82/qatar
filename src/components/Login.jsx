@@ -7,14 +7,15 @@ import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-// import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+// import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Alert } from '@mui/material';
+import { Google } from '@mui/icons-material';
 
 function Copyright(props) {
   return (
@@ -29,7 +30,7 @@ function Copyright(props) {
   );
 }
 
-const theme = createTheme();
+// const theme = createTheme();
 
 export const Login = () => {
   const [user, setUser] = useState({email:'',password:''});
@@ -80,9 +81,9 @@ export const Login = () => {
   };
   
   return (
-    <ThemeProvider theme={theme}>
+    // <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
-        <CssBaseline />
+        {/* <CssBaseline /> */}
         <Box
           sx={{
             marginTop: 8,
@@ -92,9 +93,9 @@ export const Login = () => {
           }}
         >
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            {/* <LockOutlinedIcon /> */}
+            <LockOutlinedIcon />
           </Avatar>
-          <Typography component="h1" variant="h5">
+          <Typography component="h1" variant="h5" color="primary.main">
             Iniciar Sesión
           </Typography>
           {error && (<Alert severity="error">{error}</Alert>)} 
@@ -127,16 +128,17 @@ export const Login = () => {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{ mt: 3 }}
             >
               Ingresar
             </Button>
+            <Button type='button' title='Iniciar con tu cuenta Google' fullWidth onClick={handleGoogleSignin} variant="outlined" sx={{ mt: 1, mb: 2 }}><Google/> oogle</Button>
             <Grid container>
-              <Grid item xs>
+              {/* <Grid item xs>
                 <Link href="#" variant="body2">
                   Olvidaste tu Contraseña
                 </Link>
-              </Grid>
+              </Grid> */}
               <Grid item>
                 <Link href="/register" variant="body2">
                   {"No tienes cuenta? Regístrate"}
@@ -144,12 +146,9 @@ export const Login = () => {
               </Grid>
             </Grid>
           </Box>
-          <Box component='div'>
-            <Button fullWidth onClick={handleGoogleSignin} variant="contained" sx={{ mt: 3, mb: 2 }}>Google</Button>
-          </Box>
         </Box>
         <Copyright sx={{ mt: 8, mb: 4 }} />
       </Container>
-    </ThemeProvider>
+    // </ThemeProvider>
   )
 }
