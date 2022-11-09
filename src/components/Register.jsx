@@ -11,7 +11,11 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useAuth } from '../context/AuthContext';
 import { crearUsuario } from '../connection/firebase';
+import { useNavigate } from 'react-router-dom';
+import { Alert, Snackbar } from '@mui/material';
+import { useState } from 'react';
 
 function Copyright(props) {
   return (
@@ -29,14 +33,31 @@ function Copyright(props) {
 const theme = createTheme();
 
 export const Register = () => {
-  const handleSubmit = (event) => {
+  const [user, setUser] = useState({email:'',password:''});
+  const [error, setError] = useState();
+  const {signup}= useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    setError();
     const data = new FormData(event.currentTarget);
     console.log({
       email: data.get('email'),
       password: data.get('password'),
     });
-    crearUsuario(data.get('email'),data.get('password'));
+    setUser({email:data.get('email'),password:data.get('password')})
+    console.log('el user',user);
+    // crearUsuario(data.get('email'),data.get('password'));
+    try {
+      await signup(user.email,user.password);
+      navigate('/');
+    } catch (error) {
+      console.log(error.code,error.message);
+      if(error.code === 'auth/invalid-email') setError('Correo invalido!');
+      if(error.code === 'auth/weak-password') setError('La contraseña debe tener al menos 6 caracteres!');
+      if(error.code === 'auth/email-already-in-use') setError('El correo ya fue registrado!');
+    }
   };
 
   return (
@@ -57,6 +78,10 @@ export const Register = () => {
           <Typography component="h1" variant="h5">
             Registrar Cuenta
           </Typography>
+          {/* <Snackbar open={Boolean(error)} autoHideDuration={6000}>
+            <Alert severity="success" sx={{ width: '100%' }}>{error}</Alert>
+          </Snackbar> */}
+          {error && (<Alert severity="error">{error}</Alert>)} 
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
@@ -67,6 +92,7 @@ export const Register = () => {
                   fullWidth
                   id="firstName"
                   label="Nombres"
+                  type="text"
                   autoFocus
                 />
               </Grid>
@@ -77,6 +103,7 @@ export const Register = () => {
                   id="lastName"
                   label="Apellidos"
                   name="lastName"
+                  type="text"
                   autoComplete="family-name"
                 />
               </Grid>
@@ -87,7 +114,9 @@ export const Register = () => {
                   id="email"
                   label="Correo Electrónico"
                   name="email"
+                  placeholder='tucorreo@dominio.com'
                   autoComplete="email"
+                  type="email"
                 />
               </Grid>
               <Grid item xs={12}>
@@ -98,6 +127,7 @@ export const Register = () => {
                   label="Contraseña"
                   type="password"
                   id="password"
+                  placeholder='******'
                   autoComplete="new-password"
                 />
               </Grid>
@@ -118,7 +148,7 @@ export const Register = () => {
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="/login" variant="body2">
                   Ya tienes una cuenta? Iniciar Sesión
                 </Link>
               </Grid>
