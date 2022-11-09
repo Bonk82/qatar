@@ -1,24 +1,36 @@
-import { createUserWithEmailAndPassword, GoogleAuthProvider, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth';
-import {createContext,useContext, useEffect, useState} from 'react';
-import { auth } from '../connection/firebase';
+import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
+  sendPasswordResetEmail,
+} from "firebase/auth";
+import { auth } from "../connection/firebase";
 
-export const authContext = createContext();
+const authContext = createContext();
 
-export const useAuth = ()=>{
+export const useAuth = () => {
   const context = useContext(authContext);
-  if(!context) throw new Error('No existe un proveedor de contexto Auth');
+  if (!context) throw new Error("There is no Auth provider");
   return context;
-}
+};
 
-export function AuthProvider({children}) {
+export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const registro = (email,password)=> createUserWithEmailAndPassword(auth, email, password);
+  const signup = (email, password) => {
+    return createUserWithEmailAndPassword(auth, email, password);
+  };
 
-  const login = (email, password) => signInWithEmailAndPassword(auth, email, password);
+  const login = (email, password) => {
+    return signInWithEmailAndPassword(auth, email, password);
+  };
 
-  const loginGoogle = () => {
+  const loginWithGoogle = () => {
     const googleProvider = new GoogleAuthProvider();
     return signInWithPopup(auth, googleProvider);
   };
@@ -37,6 +49,18 @@ export function AuthProvider({children}) {
   }, []);
 
   return (
-    <authContext.Provider value={{signup: registro,login,user,logout,loading,loginWithGoogle: loginGoogle,resetPassword,}}>{children}</authContext.Provider>
-  )
+    <authContext.Provider
+      value={{
+        signup,
+        login,
+        user,
+        logout,
+        loading,
+        loginWithGoogle,
+        resetPassword,
+      }}
+    >
+      {children}
+    </authContext.Provider>
+  );
 }

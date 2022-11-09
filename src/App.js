@@ -1,7 +1,10 @@
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.css';
+import { Admin } from './components/Admin';
+import { Bet } from './components/Bet';
 import { Dashboard } from './components/Dashboard';
 import { Home } from './components/Home';
+import { Info } from './components/Info';
 import { Login } from './components/Login';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Register } from './components/Register';
@@ -16,8 +19,11 @@ function App() {
         <Routes>
           <Route path='/login' element={<Login/>} />
           <Route path='/Register' element={<Register/>} />
-          <Route path='/' element={<ProtectedRoute><Home/></ProtectedRoute>} />
-          <Route path='/dashboard' element={<Dashboard/>} />
+          <Route path='/' element={<ProtectedRoute><Info/></ProtectedRoute>} />
+          <Route path='/bet' element={<ProtectedRoute><Bet/></ProtectedRoute>} />
+          <Route path='/ranking' element={<ProtectedRoute><Dashboard/></ProtectedRoute>} />
+          <Route path='/admin' element={<ProtectedRoute><Admin/></ProtectedRoute>} />
+          <Route path='/*' element={<ProtectedRoute><Navigate to='/' /></ProtectedRoute>} />
         </Routes>
       </AppTheme>
     </AuthProvider>

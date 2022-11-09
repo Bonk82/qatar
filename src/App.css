@@ -3,6 +3,7 @@
 }
 body{
   font-family: monospace;
+  background-color: antiquewhite;
 }
 
 
@@ -31,6 +32,31 @@ body{
 .App-link {
   color: #61dafb;
 }
+
+/*PARA EDITAR MATERIAL UI*/
+.MuiDataGrid-columnHeaders{
+  background-color: #56042c;
+  color: whitesmoke;
+}
+
+.MuiDataGrid-cell{
+  color: #56042c;
+}
+
+.MuiSvgIcon-root{
+  color: whitesmoke;
+}
+
+.MuiDataGrid-footerContainer{
+  background-color: #56042c;
+  color: whitesmoke;
+}
+
+.MuiDataGrid-footerContainer p{
+  color: whitesmoke;
+}
+
+
 
 @keyframes App-logo-spin {
   from {

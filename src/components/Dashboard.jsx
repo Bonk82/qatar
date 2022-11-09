@@ -2,6 +2,7 @@
 
 import { deleteScore, readScores, saveScore, updateScore } from '../connection/firebase';
 import { useState } from 'react';
+import { Navbar } from './Navbar';
 
 export const Dashboard = () => {
   const [users, setUsers] = useState([]);
@@ -34,7 +35,8 @@ export const Dashboard = () => {
     mostrar();
   }
   return (
-    <div>
+    <>
+      <Navbar/>
       <h1>Dashboarad Mundial 2022</h1> 
       <button onClick={registrar}>Registrar</button>
       <button onClick={mostrar}>Mostrar</button>
@@ -48,6 +50,6 @@ export const Dashboard = () => {
         </li>)
       })}
       </ul>
-    </div>
+    </>
   )
 }

@@ -1,4 +1,3 @@
-import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -12,13 +11,17 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import { useAuth } from '../context/AuthContext';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const pages = ['Fixture', 'Apuestas', 'Ranking','Admin'];
+const pages = ['Fixture', 'Apuestas', 'Posiciones','Admin'];
 const settings = ['Dashboard', 'Salir'];
 export const Navbar = () => {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
   const {user} = useAuth();
+
+  const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -27,8 +30,14 @@ export const Navbar = () => {
     setAnchorElUser(event.currentTarget);
   };
 
-  const handleCloseNavMenu = () => {
+  const handleCloseNavMenu = (e) => {
+    const destino = e.target.textContent 
+    console.log({destino});
     setAnchorElNav(null);
+    if(destino === 'Fixture') navigate('/');
+    if(destino === 'Apuestas') navigate('/bet');
+    if(destino === 'Posiciones') navigate('/ranking');
+    if(destino === 'Admin') navigate('/admin');
   };
 
   const handleCloseUserMenu = () => {
@@ -52,7 +61,7 @@ export const Navbar = () => {
               fontFamily: 'monospace',
               fontWeight: 700,
               letterSpacing: '.3rem',
-              color: 'inherit',
+              color: 'antiquewhite',
               textDecoration: 'none',
             }}
           >
@@ -110,7 +119,7 @@ export const Navbar = () => {
               fontFamily: 'monospace',
               fontWeight: 700,
               letterSpacing: '.3rem',
-              color: 'inherit',
+              color: 'antiquewhite',
               textDecoration: 'none',
             }}
           >
@@ -121,7 +130,7 @@ export const Navbar = () => {
               <Button
                 key={page}
                 onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
+                sx={{ my: 2, color: 'antiquewhite',fontFamily:'monospace',fontSize:'large', display: 'block' }}
               >
                 {page}
               </Button>

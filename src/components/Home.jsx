@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { guardar, listar } from '../connection/firebase';
 import { useAuth } from '../context/AuthContext';
-import { Navbar } from './Navbar';
 import { DataGrid } from '@mui/x-data-grid';
-import { Public } from '@mui/icons-material';
+import { AppLayout } from '../layout/AppLayout';
+import { Navbar } from './Navbar';
 
 export const Home = () => {
   const { logout, user } = useAuth();

@@ -1,5 +1,6 @@
 import { createTheme } from '@mui/material';
 import { purple, red } from '@mui/material/colors';
+import { esES } from '@mui/material/locale';
 
 export const qatarTheme = createTheme({
     //Ocean boat blue	#1077C3; Picton blue	#49BCE3
@@ -20,7 +21,7 @@ export const qatarTheme = createTheme({
     typography:{
         fontFamily:['monospace','arial'],
     } 
-})
+},esES)
 
 
 
