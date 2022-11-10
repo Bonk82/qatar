@@ -1,4 +1,7 @@
 import { Box, Button, InputLabel, MenuItem, Select, TextField } from "@mui/material"
+import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import moment, { now } from "moment";
 import { useEffect } from "react";
 import { useState } from "react"
 import { listar } from "../connection/firebase";
@@ -10,7 +13,7 @@ export const Admin = () => {
   }, [])
   
   const [equipos, setEquipos] = useState([]);
-  const [partido, setPartido] = useState({equipoA:'',golesA:0,equipoB:'',golesB:0,fechaPartido:null})
+  const [partido, setPartido] = useState({equipoA:'',golesA:0,equipoB:'',golesB:0,fechaPartido:moment().toDate().setMinutes(0)})
 
   const cargarEquipos = async () =>{
     let resp = await listar('equipo');
@@ -43,12 +46,16 @@ export const Admin = () => {
     setPartido({...partido,[name]:value})
   }
 
+  const handleChangeFecha = (newValue) => {
+    setPartido({...partido,fechaPartido:newValue});
+  };
+
   return (
     <>
     <Navbar/>
     <Box component='main' sx={{textAlign:'center'}} >
       <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1,marginTop: 8,display: 'flex', flexDirection: 'column', alignItems: 'center',width:500}}>
-      <InputLabel id="equipoA">Equipo A</InputLabel>
+        <InputLabel id="equipoA">Equipo A</InputLabel>
         <Select
           labelId="equipoA"
           id="equipoA"
@@ -63,23 +70,48 @@ export const Admin = () => {
           })
         }
         </Select>
-        <TextField
-          margin="normal"
-          required
+        <InputLabel id="equipoB">Equipo B</InputLabel>
+        <Select
+          labelId="equipoB"
+          id="equipoB"
+          name="equipoB"
           fullWidth
-          name="golesA"
-          label="Goles"
-          id="golesA"
-          type='number'
-        />
-        <Button
-          type="submit"
+          value={partido.equipoB}
+          label="Equipo B"
+          onChange={handleChange}
+        >{
+          equipos.map(e=>{
+            return <MenuItem key={e.nombre} value={e.nombre}>{e.nombre}</MenuItem>
+          })
+        }
+        </Select>
+        <LocalizationProvider dateAdapter={AdapterMoment}>
+          <DateTimePicker
+            label="Fecha y Hora Partido"
+            fullWidth
+            value={partido.fechaPartido}
+            onChange={handleChangeFecha}
+            ampm = {false}
+            // maxDate={'20221218'}
+            // maxTime={'15:00:00'}
+            // minTime={'06:00:00'}
+            views={['year','month','day','hours']}
+            renderInput={(params) => <TextField {...params} />}
+          />
+        </LocalizationProvider>
+        {/* <InputLabel id="fechaPartido">Horario</InputLabel>
+        <Select
+          labelId="fechaPartido"
+          id="fechaPartido"
+          name="fechaPartido"
           fullWidth
-          variant="contained"
-          sx={{ mt: 3 }}
+          value={partido.fechaPartido}
+          label="fechaPartido"
+          onChange={handleChange}
         >
-          Registrar
-        </Button>
+          <MenuItem value='06:00'>06:00</MenuItem>
+        </Select> */}
+        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3 }}>Registrar</Button>
       </Box>
     </Box>
     </>
