@@ -2,6 +2,7 @@ import { Box, Button, ButtonGroup } from "@mui/material"
 import { DataGrid ,esES} from "@mui/x-data-grid";
 import { useState } from "react";
 import { listar } from "../connection/firebase";
+import { useAuth } from "../context/AuthContext";
 import { Navbar } from "./Navbar"
 
 // const [dtsResultados, setDtsResultados] = useState([]);
@@ -15,10 +16,12 @@ export const Info = () => {
     <Button sx={{fontWeight:'bold'}} key="dinamico" onClick={()=>cargarGrilla('dinamico')}>Dinámico</Button>
   ];
 
+  const {tipoUsuario}= useAuth()
+
   const [grilla, setGrilla] = useState({mostrar:false,filas:[],columnas:[],tipo:''});
 
   const cargarGrilla = async (tipo)=>{
-    console.log(tipo);
+    console.log(tipo,tipoUsuario);
     if(grilla.tipo === tipo){
       setGrilla({mostrar:false,filas:[],columnas:[],tipo:''})
     }else{

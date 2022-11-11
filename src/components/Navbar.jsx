@@ -11,15 +11,24 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import { useAuth } from '../context/AuthContext';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const pages = ['Fixture', 'Apuestas', 'Posiciones','Admin'];
 const settings = ['Dashboard', 'Salir'];
 export const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const {user,logout} = useAuth();
+  const [pages, setPages] = useState(['Fixture', 'Apuestas', 'Posiciones'])
+
+  useEffect(() => {
+    console.log('revisando',user);
+    if(user.rol === 'administrador'){
+      const pagesAdmin = ['Fixture', 'Apuestas', 'Posiciones','Admin']
+      setPages(pagesAdmin)
+    }
+  }, [user])
+  
 
   const navigate = useNavigate();
 

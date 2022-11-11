@@ -9,14 +9,33 @@ import { useState } from "react"
 import { actualizar, guardar, listar, listarEquipos } from "../connection/firebase";
 import { Navbar } from "./Navbar"
 import SaveAsIcon from '@mui/icons-material/SaveAs';
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 
 export const Admin = () => {
+  const {user } = useAuth();
+  const navigate = useNavigate();
+ const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
-    cargarEquipos();
-    listarPartidos();
+    (user.rol !== 'administrador') ? navigate('/'): setIsAdmin(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
+  
+  useEffect(() => {
+      cargarEquipos();
+      listarPartidos();
   }, [])
+
+
+
+  // const revisarAdmin = async() =>{
+  //   const resp = await listar('usuario')
+  //   const elUser = resp.filter(f=>f.userID === user.uuid)[0]?.tipo;
+  //   console.log('revisAdmin',resp,elUser);
+  //   (elUser!=='administrador' || !elUser ) ? navigate('/'):isAdmin = true; 
+  // }
 
   const onChangeScore = async (e)=>{
     console.log('score',e);
@@ -119,6 +138,7 @@ export const Admin = () => {
   return (
     <>
     <Navbar/>
+    {isAdmin && 
     <Box component='main' sx={{backgroundColor:'whitesmoke',height:'100vh',width:'100vw',display:'flex',justifyContent:'center',gap:2}} >
       <Box component="form" onSubmit={handleSubmit} noValidate sx={{alignItems:'center',width:{xs:'100vw',md:700},mt:4}}>
         <InputLabel color="primary" >Equipo A</InputLabel>
@@ -186,6 +206,7 @@ export const Admin = () => {
         />
       </Box>
     </Box>
+    }
     <Snackbar onClose={handleClose} open={alerta[0]} TransitionComponent={slideAlert} autoHideDuration={3000} anchorOrigin={{vertical:'top',horizontal:'right'}}>
       <Alert severity={alerta[1]} sx={{ width: '100%' }}> {alerta[2]}</Alert>
     </Snackbar>
