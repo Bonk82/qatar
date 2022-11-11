@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore,collection, addDoc,getDocs, getDoc, deleteDoc,doc, updateDoc, serverTimestamp   } from "firebase/firestore";
+import { getFirestore,collection, addDoc,getDocs, getDoc, deleteDoc,doc, updateDoc, serverTimestamp, query, orderBy, limit   } from "firebase/firestore";
 import {createUserWithEmailAndPassword, getAuth} from 'firebase/auth'
 
 
@@ -105,6 +105,8 @@ export const updateScore = async id=>{
 //MODELOS GENERALES
 export const listar = async(coleccion)=>{
   const usuarios = await getDocs(collection(db, coleccion));
+  // const ord = query(usuarios, orderBy("nombre"), limit(3));
+  // console.log('la orden',ord);
   let u = [];
    usuarios.forEach((doc) => {
     // console.log(`${doc.id} => ${doc.data()}`,doc.data());
@@ -115,8 +117,11 @@ export const listar = async(coleccion)=>{
   return u;
 }
 
+
 export const guardar = async(coleccion,documento) => {
   console.log(coleccion,documento);
+  if(documento.fechaPartido) documento.fechaPartido = new Date(documento.fechaPartido);
+  documento.fechaRegistro = serverTimestamp();
   try {
     const docRef = await addDoc(collection(db,coleccion),documento);
     console.log("documento almacenado con ID: ", docRef.id);

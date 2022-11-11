@@ -3,7 +3,6 @@
 }
 body{
   font-family: monospace;
-  background-color: antiquewhite;
 }
 
 
@@ -54,6 +53,10 @@ body{
 
 .MuiDataGrid-footerContainer p{
   color: whitesmoke;
+}
+
+legend span{
+  color: #56042c;
 }
 
 

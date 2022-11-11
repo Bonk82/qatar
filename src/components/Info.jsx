@@ -72,7 +72,7 @@ export const Info = () => {
           </Box>
         </Box>}
         {grilla.mostrar && <Box sx={{display:'flex',justifyContent:'center'}}>
-          <Box sx={{width:{xs:'100%',md:'80%'},height: '90vh'}} >
+          <Box sx={{width:{xs:'100%',md:'80%'},height: '85vh'}} >
           <DataGrid
               rows={grilla.filas}
               columns={grilla.columnas}
