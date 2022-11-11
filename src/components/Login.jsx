@@ -15,6 +15,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Alert } from '@mui/material';
 import { Google } from '@mui/icons-material';
+import { guardar, listar } from '../connection/firebase';
 
 function Copyright(props) {
   return (
@@ -36,6 +37,7 @@ export const Login = () => {
   const [error, setError] = useState();
   const {login, loginWithGoogle, resetPassword}= useAuth();
   const navigate = useNavigate();
+  const logeado = useAuth();
 
   //mejor opcion para ir setenado los valores de cada control del form 
   // const handleChange = ({ target: { value, name } }) => setUser({ ...user, [name]: value });
@@ -50,7 +52,8 @@ export const Login = () => {
     console.log('el user',user);//dentro de la misma funcion no agarra el valor actulizado del setState
     // crearUsuario(data.get('email'),data.get('password'));
     try {
-      await login(usuario.email,usuario.password);
+      const resp = await login(usuario.email,usuario.password);
+      console.log(resp);
       navigate('/');
     } catch (error) {
       console.log(error.code,error.message);
@@ -61,7 +64,14 @@ export const Login = () => {
 
   const handleGoogleSignin = async () => {
     try {
-      await loginWithGoogle();
+      const resp = await loginWithGoogle();
+      let yaRegistrado = await listar('usuario')
+      yaRegistrado = yaRegistrado.filter(f=>f.userID===resp.user?.uid);
+      console.log(resp,yaRegistrado);
+      if(yaRegistrado.length === 0){
+        const newUser = {nombre:resp.user?.displayName,tipo:'usuario',estado:'lectura',userID:resp.user?.uid};
+        await guardar('usuario',newUser);
+      }
       navigate("/");
     } catch (error) {
       setError(error.message);
@@ -70,10 +80,10 @@ export const Login = () => {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-    if (!user.email) return setError("Write an email to reset password");
+    if (!user.email) return setError("Escribe un email valido");
     try {
       await resetPassword(user.email);
-      setError('We sent you an email. Check your inbox')
+      setError('Ya te enviamso el correo, por favor revisa tus bandejas')
     } catch (error) {
       setError(error.message);
     }

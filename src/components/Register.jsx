@@ -13,6 +13,8 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Alert } from '@mui/material';
 import { useState } from 'react';
+import { guardar } from '../connection/firebase';
+import { TextFieldsSharp } from '@mui/icons-material';
 
 function Copyright(props) {
   return (
@@ -40,12 +42,16 @@ export const Register = () => {
     console.log({
       email: data.get('email'),
       password: data.get('password'),
+      nombre:data.get('nombre'),
     });
     setUser({email:data.get('email'),password:data.get('password')})
     console.log('el user',user);
     // crearUsuario(data.get('email'),data.get('password'));
     try {
-      await signup(user.email,user.password);
+      const resp = await signup(data.get('email'),data.get('password'));
+      console.log('signup',resp);
+      const newUser = {nombre:data.get('nombre'),tipo:'usuario',estado:'lectura',userID:resp.user?.uid};
+      await guardar('usuario',newUser);
       navigate('/');
     } catch (error) {
       console.log(error.code,error.message);
@@ -74,27 +80,15 @@ export const Register = () => {
           {error && (<Alert severity="error">{error}</Alert>)} 
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12}>
                 <TextField
-                  autoComplete="given-name"
-                  name="firstName"
+                  name="nombre"
                   required
                   fullWidth
-                  id="firstName"
-                  label="Nombres"
+                  id="nombre"
+                  label="Nombre"
                   type="text"
                   autoFocus
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Apellidos"
-                  name="lastName"
-                  type="text"
-                  autoComplete="family-name"
                 />
               </Grid>
               <Grid item xs={12}>

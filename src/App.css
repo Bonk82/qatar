@@ -59,6 +59,14 @@ legend span{
   color: #56042c;
 }
 
+.MuiDataGrid-menuIcon .MuiSvgIcon-root{
+  color: whitesmoke;
+}
+
+.MuiDataGrid-iconButtonContainer .MuiSvgIcon-root{
+  color: whitesmoke;
+}
+
 
 
 

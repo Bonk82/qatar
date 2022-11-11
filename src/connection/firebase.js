@@ -132,11 +132,12 @@ export const guardar = async(coleccion,documento) => {
 }
 
 export const actualizar = async (coleccion,id,documento)=>{
-  const documentoRef = await (getDoc(doc(db, coleccion,id))).data();//rellenar los datos con esta data
-  console.log(documentoRef);
+  console.log('actualizando',coleccion,id,documento);
+  const documentoRef = doc(db, coleccion,id);//rellenar los datos con esta data
+  console.log('el doc para actualizar',documentoRef);
   // updateDoc(doc(db,coleccion,id))
   documento.fechaActualizado = serverTimestamp();
-  updateDoc(documentoRef,documento)
+  await updateDoc(documentoRef,documento)
 }
 
 export const eliminar = async (coleccion,id)=>{

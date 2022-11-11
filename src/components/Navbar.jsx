@@ -19,7 +19,7 @@ const settings = ['Dashboard', 'Salir'];
 export const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const {user} = useAuth();
+  const {user,logout} = useAuth();
 
   const navigate = useNavigate();
 
@@ -40,8 +40,15 @@ export const Navbar = () => {
     if(destino === 'Admin') navigate('/admin');
   };
 
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
+  const handleCloseUserMenu = async (e) => {
+    console.log(e.target?.textContent);
+    if(e.target?.textContent === 'Salir'){
+      try {
+        await logout();
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
   };
 
   return (
