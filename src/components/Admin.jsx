@@ -1,4 +1,4 @@
-import { Alert, Box, Button, IconButton, InputLabel, MenuItem, OutlinedInput, Select, Slide, Snackbar, TextField, Typography } from "@mui/material"
+import { Alert, Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton, InputLabel, MenuItem, OutlinedInput, Select, Slide, Snackbar, TextField, Typography } from "@mui/material"
 import { DataGrid } from "@mui/x-data-grid";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
@@ -12,6 +12,7 @@ import SaveAsIcon from '@mui/icons-material/SaveAs';
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+let equiposAll = [];
 
 export const Admin = () => {
   const {user } = useAuth();
@@ -40,12 +41,47 @@ export const Admin = () => {
   const onChangeScore = async (e)=>{
     console.log('score',e);
     try {
-      const nuevoObj  = {golesA:e.golesA,golesB:e.golesB}
-      await actualizar('partido',e.id,nuevoObj)
+      const nuevoObj  = {golesA:e.golesA,golesB:e.golesB,finalizado:true}
+      await actualizar('partido',e.id,nuevoObj);
+      await actualizarPuntuacion(e);
+      console.log('ya se actualizo');
       setAlerta(true,'success','Marcador actualizado con éxito!')
     } catch (error) {
       setAlerta(true,'danger','Marcador actualizado con éxito!')
     }
+  }
+
+  const actualizarPuntuacion = async (data) =>{
+    console.log(data);
+    let ptsA=0;
+    if(data.golesA > data.golesB) ptsA=3;
+    if(data.golesA === data.golesB) ptsA=1;
+    //para equipo A
+    let elEquipo = equiposAll.filter(f=>f.nombre === data.equipoA)[0];
+    let equipoAct = {
+      jugados : parseInt(elEquipo.jugados || 0)+1,
+      ganados : parseInt(elEquipo.ganados || 0) + ptsA===3?1:0,
+      empatados : parseInt(elEquipo.empatados || 0) + ptsA===1?1:0,
+      perdidos : parseInt(elEquipo.pertidos || 0) + ptsA===0?1:0,
+      favor : parseInt(elEquipo.favor || 0) + data.golesA,
+      contra : parseInt(elEquipo.contra || 0) + data.golesB,
+      diferencia : parseInt(elEquipo.diferencia || 0) + (data.golesA - data.golesB),
+      puntos : parseInt(elEquipo.puntos || 0) + ptsA,      
+    }
+    await actualizar('equipo',elEquipo.id,equipoAct);
+    //para equipo B
+    elEquipo = equiposAll.filter(f=>f.nombre === data.equipoB)[0];
+    equipoAct = {
+      jugados : parseInt(elEquipo.jugados || 0)+1,
+      ganados : parseInt(elEquipo.ganados || 0) + ptsA===0?1:0,
+      empatados : parseInt(elEquipo.empatados || 0) + ptsA===1?1:0,
+      perdidos : parseInt(elEquipo.pertidos || 0) + ptsA===3?1:0,
+      favor : parseInt(elEquipo.favor || 0) + data.golesB,
+      contra : parseInt(elEquipo.contra || 0) + data.golesA,
+      diferencia : parseInt(elEquipo.diferencia || 0) + (data.golesB - data.golesA),
+      puntos : parseInt(elEquipo.puntos || 0) + (ptsA===0?3:ptsA===3?0:1),      
+    }
+    await actualizar('equipo',elEquipo.id,equipoAct);
   }
 
   const colPartidos = [
@@ -67,7 +103,7 @@ export const Admin = () => {
     {field:'golesA',headerName:'Goles A', width: 70,editable:true,type:'number',min:0,max:9},
     {field:'equipoB',headerName:'Equipo B', width: 150,editable:false},
     {field:'golesB',headerName:'Goles B', width: 70,editable:true,type:'number'},
-    {field:'fechaPartido',headerName:'Fecha Partido', width: 120,editable:false},
+    {field:'fechaPartidoStr',headerName:'Fecha Partido', width: 120,editable:false},
     {field:'id',headerName:'ID'},
   ]
   
@@ -81,16 +117,18 @@ export const Admin = () => {
     // let respi = resp.sort((a,b)=> a.nombre - b.nombre);
     let respi = alasql('select * from ? order by nombre',[resp])
     console.log('equipos',respi);
+    equiposAll = respi;
     setEquipos(respi);
   }
 
   const listarPartidos = async()=>{
     let resp = await listar('partido');
     resp.map(e=>{
-      e.fechaPartido = moment(e.fechaPartido.toDate()).format('DD/MMM HH:mm');
+      e.fechaPartidoStr = moment(e.fechaPartido.toDate()).format('DD/MMM HH:mm');
       return e
     })
-    let respi = resp.sort((a,b)=> new Date(a.fechaPartido) - new Date(b.fechaPartido));
+    let respi = resp.sort((a,b)=> new Date(a.fechaPartido).getTime() - new Date(b.fechaPartido).getTime());
+    // let respi = alasql('select * from ? order by ')
     console.log('partidos',respi);
     setPartidos(respi);
   }
@@ -111,6 +149,7 @@ export const Admin = () => {
       document.querySelector('#equipoA').value = '';
       document.querySelector('#equipoB').value = '';
       document.querySelector('#equipoA').focus();
+      setEquipos(equiposAll);
       listarPartidos();
     } catch (error) {
       console.log(error.code,error.message);
@@ -120,6 +159,10 @@ export const Admin = () => {
 
   const handleChange = ({target:{value,name}})=>{
     setPartido({...partido,[name]:value})
+    console.log(document.querySelector('#faseGrupos').value);
+    const grupo = equipos.filter(f=>f.nombre === value)[0]?.grupo;
+    const pivot = equipos.filter(f=>f.grupo === grupo);
+    setEquipos(pivot); 
   }
 
   const handleChangeFecha = (newValue) => {
@@ -141,6 +184,9 @@ export const Admin = () => {
     {isAdmin && 
     <Box component='main' sx={{backgroundColor:'whitesmoke',height:'100vh',width:'100vw',display:'flex',justifyContent:'center',gap:2}} >
       <Box component="form" onSubmit={handleSubmit} noValidate sx={{alignItems:'center',width:{xs:'100vw',md:700},mt:4}}>
+        <FormGroup>
+          <FormControlLabel control={<Checkbox id="faseGrupos" defaultChecked />} label="Fase de grupos" />
+        </FormGroup>
         <InputLabel color="primary" >Equipo A</InputLabel>
         <Select
           labelId="equipoA"
@@ -203,6 +249,7 @@ export const Admin = () => {
           disableSelectionOnClick
           experimentalFeatures={{ newEditingApi: true }}
           columnVisibilityModel={{id:false}}
+          sortModel={[{field:'fechaPartido'}]}
         />
       </Box>
     </Box>
