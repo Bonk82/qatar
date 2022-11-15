@@ -69,7 +69,7 @@ export const Login = () => {
       yaRegistrado = yaRegistrado.filter(f=>f.userID===resp.user?.uid);
       console.log(resp,yaRegistrado);
       if(yaRegistrado.length === 0){
-        const newUser = {nombre:resp.user?.displayName,tipo:'usuario',estado:'lectura',userID:resp.user?.uid};
+        const newUser = {nombre:resp.user?.displayName,tipo:'usuario',estado:'lectura',userID:resp.user?.uid,grupo:'UPRE'};
         await guardar('usuario',newUser);
       }
       navigate("/");

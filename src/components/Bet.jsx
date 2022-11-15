@@ -46,11 +46,11 @@ const listarPartidos = async()=>{
   bet = bet.filter(f=>f.uid===user.uid)
   part.map(e=>{
     e.fechaPartidoStr = moment(e.fechaPartido.toDate()).format('DD/MMM HH:mm');
-    e.activo = moment(e.fechaPartido.toDate()).add(-10,'days') <= moment() ? 0 : 1 ;//TODO: cambiar days x minutes 
+    e.activo = moment(e.fechaPartido.toDate()).add(-10,'minutes') <= moment() ? 0 : 1 ;//TODO: cambiar days x minutes 
     e.betA = bet.filter(f=>f.partidoID === e.id)[0]?.golesA || 0;
     e.betB = bet.filter(f=>f.partidoID === e.id)[0]?.golesB || 0;
     e.apuestaID = bet.filter(f=>f.partidoID === e.id)[0]?.id;
-    e.puntos = bet.filter(f=>f.partidoID === e.id)[0]?.puntos;
+    e.puntos = bet.filter(f=>f.partidoID === e.id)[0]?.puntos || 0;
     return e
   })
 
@@ -64,34 +64,18 @@ const listarPartidos = async()=>{
   setApuestas(pivotActivos);
 }
 
-const paraRevisar = (r,row) =>{
-console.log(r,row);
-}
-
 const colPartidos = [
-  {field: 'Acciones', headerName: 'Acciones', sortable: false, width:80,
-    renderCell: (params) => {
-      const onClick = (e) => {
-        // e.stopPropagation(); // don't select this row after clicking
-        const api = params.api;
-        const thisRow = {};
-        api.getAllColumns().filter((c) => c.field !== '__check__' && !!c)
-          .forEach((c) => (thisRow[c.field] = params.getValue(params.id, c.field)));
-        // return alert(JSON.stringify(thisRow, null, 4));
-        paraRevisar(thisRow,params.row)
-      };
-      if(params.row.activo ===0) return <IconButton onClick={onClick} disabled title='Ya jugado' color='secondary' size="large"><CheckCircleIcon/></IconButton>;
-      return <IconButton onClick={onClick} title='Apostar' color='primary' size="large"><PaidIcon/></IconButton>;
-    },
-  },
   {field:'fechaPartidoStr',headerName:'Fecha Partido', width: 120,editable:false},
   {field:'equipoA',headerName:'Equipo A', width: 150,editable:false},
+  {field: 'imageA', headerName: 'EquipoA', width: 100, editable: false
+  , renderCell: (params) => <img title={`${params.row.equipoA}`} width='70px' src={`../assets/${params.row.equipoA}.png`} alt='S/I'/>},
   {field:'golesA',headerName:'Goles A', width: 70,editable:true,type:'number',min:0,max:9},
-  {field:'betA',headerName:'Goles A', width: 70,editable:true,type:'number',min:0,max:9}, 
-  // , renderCell :(params)=>{if(params.row.betA === params.row.golesA) return}},
+  {field:'betA',headerName:'Apuesta A', width: 70,editable:true,type:'number',min:0,max:9},
   {field:'equipoB',headerName:'Equipo B', width: 150,editable:false},
+  {field: 'imageB', headerName: 'EquipoA', width: 100, editable: false
+  , renderCell: (params) => <img title={`${params.row.equipoB}`} width='70px' src={`../assets/${params.row.equipoB}.png`} alt='S/I'/>},
   {field:'golesB',headerName:'Goles B', width: 70,editable:true,type:'number'},
-  {field:'betB',headerName:'Goles B', width: 70,editable:true,type:'number'},
+  {field:'betB',headerName:'Apuesta B', width: 70,editable:true,type:'number'},
   {field:'puntos',headerName:'Puntos', width: 70,type:'number'},
   {field:'id',headerName:'ID'},
   {field:'apuestaID',headerName:'apuestaID'},
@@ -100,24 +84,16 @@ const colPartidos = [
 const colApuestas = [
   {field: 'Acciones', headerName: 'Acciones', sortable: false, width:80,
     renderCell: (params) => {
-      const onClick = (e) => {
-        // e.stopPropagation(); // don't select this row after clicking
-        const api = params.api;
-        const thisRow = {};
-        api.getAllColumns().filter((c) => c.field !== '__check__' && !!c)
-          .forEach((c) => (thisRow[c.field] = params.getValue(params.id, c.field)));
-        // return alert(JSON.stringify(thisRow, null, 4));
-        onApuesta(thisRow)
-      };
-      if(params.row.activo ===0) return <IconButton onClick={onClick} disabled title='Ya jugado' color='secondary' size="large"><CheckCircleIcon/></IconButton>;
-      return <IconButton onClick={onClick} title='Apostar' color='primary' size="large"><PaidIcon/></IconButton>;
+      return <IconButton onClick={()=>onApuesta(params.row)} title='Apostar' color='primary' size="large"><PaidIcon/></IconButton>;
     },
   },
   {field:'fechaPartidoStr',headerName:'Fecha Partido', width: 120,editable:false},
-  {field: 'image', headerName: 'Image', width: 150, editable: true
-  , renderCell: (params) => <img title={`${params.row.equipoA}`} src={`../assets/${params.row.equipoA}.png`} alt='S/I'/>},
+  {field: 'imageA', headerName: 'EquipoA', width: 100, editable: false
+  , renderCell: (params) => <img title={`${params.row.equipoA}`} width='70px' src={`../assets/${params.row.equipoA}.png`} alt='S/I'/>},
   {field:'equipoA',headerName:'Equipo A', width: 150,editable:false},
   {field:'betA',headerName:'Goles A', width: 70,editable:true,type:'number',min:0,max:9},
+  {field: 'imageB', headerName: 'EquipoB', width: 100, editable: false
+  , renderCell: (params) => <img title={`${params.row.equipoB}`} width='70px' src={`../assets/${params.row.equipoB}.png`} alt='S/I'/>},
   {field:'equipoB',headerName:'Equipo B', width: 150,editable:false},
   {field:'betB',headerName:'Goles B', width: 70,editable:true,type:'number'},
   {field:'id',headerName:'ID'},
@@ -138,11 +114,14 @@ const colApuestas = [
       <Navbar/>
       <Box component='main' sx={{backgroundColor:'whitesmoke',height:'100vh',width:'100vw',display:'flex',justifyContent:'center',gap:2}} >
         <Box sx={{ height: 450, width:{xs:'98vw',md:700},justifyContent:'center',mt:4,
-                '& .acierto': {
-                  backgroundColor: '#dcfae8',
+                '& .gana1': {
+                  backgroundColor: '#a5f2b3',
                 },
-                '& .fallo': {
-                  backgroundColor: '#f7cdbc',
+                '& .gana3': {
+                  backgroundColor: '#52e36c',
+                },
+                '& .gana5': {
+                  backgroundColor: '#18d93a',
                 } }}>
           <Typography variant="h5" sx={{fontWeight:500}} color="primary" >Historial Apuestas</Typography>
           <DataGrid
@@ -152,11 +131,11 @@ const colApuestas = [
             rowsPerPageOptions={[10]}
             disableSelectionOnClick
             experimentalFeatures={{ newEditingApi: true }}
-            columnVisibilityModel={{id:false,apuestaID:false,activo:false}}
+            columnVisibilityModel={{id:false,apuestaID:false,activo:false,equipoA:false,equipoB:false}}
             localeText={esES.components.MuiDataGrid.defaultProps.localeText}
             // sortModel={[{field:'fechaPartido'}]}
             getCellClassName={(params) => {
-              return params.row.golesA === params.row.betA ? 'acierto' : 'fallo';
+              return params.row.puntos >= 5 ? 'gana5' : params.row.puntos >= 3 ? 'gana3' : params.row.puntos >= 1 ? 'gana1':'nada';
             }}
           />
         </Box>
@@ -169,7 +148,7 @@ const colApuestas = [
             rowsPerPageOptions={[10]}
             disableSelectionOnClick
             experimentalFeatures={{ newEditingApi: true }}
-            columnVisibilityModel={{id:false,apuestaID:false,activo:false}}
+            columnVisibilityModel={{id:false,apuestaID:false,activo:false,equipoA:false,equipoB:false}}
             // sortModel={[{field:'fechaPartido'}]}
             localeText={esES.components.MuiDataGrid.defaultProps.localeText}
           />

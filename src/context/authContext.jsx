@@ -43,8 +43,10 @@ export function AuthProvider({ children }) {
     const usuarios = await listar('usuario')
     console.log('verrol',usuarios,cu);
     const rol =  usuarios.filter(f=>f.userID === cu?.uid)[0]?.tipo;
+    const estado =  usuarios.filter(f=>f.userID === cu?.uid)[0]?.estado;
     const elUser = cu;
-    elUser.rol = rol
+    elUser.rol = rol;
+    elUser.estado = estado;
     setUser(elUser);
     setLoading(false);
   } 

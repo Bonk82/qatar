@@ -7,6 +7,7 @@ import { Home } from './components/Home';
 import { Info } from './components/Info';
 import { Login } from './components/Login';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { Rank } from './components/Rank';
 import { Register } from './components/Register';
 import { AuthProvider } from './context/AuthContext';
 import {AppTheme} from './themes/AppTheme'
@@ -21,7 +22,7 @@ function App() {
           <Route path='/Register' element={<Register/>} />
           <Route path='/' element={<ProtectedRoute><Info/></ProtectedRoute>} />
           <Route path='/bet' element={<ProtectedRoute><Bet/></ProtectedRoute>} />
-          <Route path='/ranking' element={<ProtectedRoute><Dashboard/></ProtectedRoute>} />
+          <Route path='/ranking' element={<ProtectedRoute><Rank/></ProtectedRoute>} />
           <Route path='/admin' element={<ProtectedRoute><Admin/></ProtectedRoute>} />
           <Route path='/*' element={<ProtectedRoute><Navigate to='/' /></ProtectedRoute>} />
         </Routes>

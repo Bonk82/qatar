@@ -1,5 +1,5 @@
 import { createTheme } from '@mui/material';
-import { purple, red } from '@mui/material/colors';
+import { purple, red, teal } from '@mui/material/colors';
 import { esES } from '@mui/material/locale';
 
 export const qatarTheme = createTheme({
@@ -10,6 +10,9 @@ export const qatarTheme = createTheme({
         },
         secondary: {
             main: '#fec310'
+        },
+        success: {
+            main: teal[600]
         },
         error: {
             main: red.A400
