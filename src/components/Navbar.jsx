@@ -154,7 +154,7 @@ export const Navbar = () => {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            <Typography sx={{display:{xs:'none',md:'inline-flex'},marginRight:4}}>bienvenido {user.displayName || user.email}</Typography>
+            <Typography sx={{display:{xs:'none',md:'inline-flex'},marginRight:4,color:'antiquewhite'}}>bienvenido {user.displayName || user.email}</Typography>
             <Tooltip title="Configuraciones">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="C" src={user.providerData[0]?.photoURL || user.reloadUserInfo?.photoUrl} />

@@ -101,6 +101,7 @@ export const Info = () => {
               pageSize={10}
               rowsPerPageOptions={[10]}
               disableSelectionOnClick
+              autoHeight
               experimentalFeatures={{ newEditingApi: true }}
               localeText={esES.components.MuiDataGrid.defaultProps.localeText}
               // sortModel={grilla.orden}

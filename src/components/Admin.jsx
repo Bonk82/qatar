@@ -1,5 +1,5 @@
 import { Alert, Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton, InputLabel, MenuItem, OutlinedInput, Select, Slide, Snackbar, TextField, Typography } from "@mui/material"
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, esES } from "@mui/x-data-grid";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import alasql from "alasql";
@@ -44,6 +44,7 @@ export const Admin = () => {
       const nuevoObj  = {golesA:e.golesA,golesB:e.golesB,finalizado:true}
       await actualizar('partido',e.id,nuevoObj);
       await actualizarPuntuacion(e);
+      await puntuarApuestas(e);
       console.log('ya se actualizo');
       setAlerta(true,'success','Marcador actualizado con éxito!')
     } catch (error) {
@@ -82,6 +83,33 @@ export const Admin = () => {
       puntos : parseInt(elEquipo.puntos || 0) + (ptsA===0?3:ptsA===3?0:1),      
     }
     await actualizar('equipo',elEquipo.id,equipoAct);
+  }
+
+  const puntuarApuestas = async (data) =>{
+    const apuestas = await listar('apuesta');
+    apuestas.map(e=>{
+      let puntaje = 0
+      if(data.golesA === e.golesA) puntaje+=1;
+      if(data.golesB === e.golesB) puntaje+=1;
+      if(data.golesA === e.golesA && data.golesB === e.golesB) puntaje+=1;
+      if(data.golesA > data.golesB && e.golesA > e.golesB) puntaje += 2
+      if(data.golesA < data.golesB && e.golesA < e.golesB) puntaje += 2
+      if(data.golesA === data.golesB && e.golesA === e.golesB) puntaje += 2
+      //TODO: agregar la valoracion del factor de equipo y el tiempo antes del partido
+      e.puntos = puntaje;
+      console.log('lapuesta',e);
+      return e;
+    });
+
+    apuestas.forEach(async (e) => {
+      try {
+        await actualizar('apuesta',e.id,{puntos:e.puntos})
+        console.log('apuesta actualizada',e.id);
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
   }
 
   const colPartidos = [
@@ -127,10 +155,10 @@ export const Admin = () => {
       e.fechaPartidoStr = moment(e.fechaPartido.toDate()).format('DD/MMM HH:mm');
       return e
     })
-    let respi = resp.sort((a,b)=> new Date(a.fechaPartido).getTime() - new Date(b.fechaPartido).getTime());
-    // let respi = alasql('select * from ? order by ')
-    console.log('partidos',respi);
-    setPartidos(respi);
+    // let respi = resp.sort((a,b)=> new Date(a.fechaPartido).getTime() - new Date(b.fechaPartido).getTime());
+    resp = alasql('select * from ? order by fechaPartido',[resp])
+    console.log('partidos',resp);
+    setPartidos(resp);
   }
 
   const handleSubmit = async(e)=>{
@@ -182,8 +210,9 @@ export const Admin = () => {
     <>
     <Navbar/>
     {isAdmin && 
-    <Box component='main' sx={{backgroundColor:'whitesmoke',height:'100vh',width:'100vw',display:'flex',justifyContent:'center',gap:2}} >
-      <Box component="form" onSubmit={handleSubmit} noValidate sx={{alignItems:'center',width:{xs:'100vw',md:700},mt:4}}>
+    <Box component='main' sx={{backgroundColor:'whitesmoke',height:'100vh',width:'100vw',display:'flex',flexDirection:{xs:'column',md:'row'},justifyContent:'center',gap:2}} >
+      <Box component="form" onSubmit={handleSubmit} noValidate sx={{alignItems:'center',width:{xs:'100vw',md:700},mt:2}}>
+        <Typography variant="h5" color='primary'>Registro de Partidos</Typography>
         <FormGroup>
           <FormControlLabel control={<Checkbox id="faseGrupos" defaultChecked />} label="Fase de grupos" />
         </FormGroup>
@@ -240,7 +269,8 @@ export const Admin = () => {
         </Box>
         <Button type="submit" fullWidth variant="contained" sx={{ mt: 3}}>Registrar</Button>
       </Box>
-      <Box sx={{ height: 450, width:{xs:'98vw',md:700},justifyContent:'center',mt:4 }}>
+      <Box sx={{ height: 450, width:{xs:'98vw',md:700},justifyContent:'center',mt:2 }}>
+        <Typography variant="h5" color='primary'>Actualización de Resultados</Typography>
         <DataGrid
           rows={partidos}
           columns={colPartidos}
@@ -249,7 +279,8 @@ export const Admin = () => {
           disableSelectionOnClick
           experimentalFeatures={{ newEditingApi: true }}
           columnVisibilityModel={{id:false}}
-          sortModel={[{field:'fechaPartido'}]}
+          // sortModel={[{field:'fechaPartido'}]}
+          localeText={esES.components.MuiDataGrid.defaultProps.localeText}
         />
       </Box>
     </Box>

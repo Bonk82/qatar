@@ -1,5 +1,5 @@
 import { Alert, Box, IconButton, Slide, Snackbar, Typography } from "@mui/material"
-import { DataGrid } from "@mui/x-data-grid"
+import { DataGrid, esES } from "@mui/x-data-grid"
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { actualizar, guardar, listar } from "../connection/firebase";
@@ -7,6 +7,7 @@ import { useAuth } from "../context/AuthContext";
 import { Navbar } from "./Navbar"
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PaidIcon from '@mui/icons-material/Paid';
+import alasql from "alasql";
 
 export const Bet = () => {
 
@@ -45,18 +46,19 @@ const listarPartidos = async()=>{
   bet = bet.filter(f=>f.uid===user.uid)
   part.map(e=>{
     e.fechaPartidoStr = moment(e.fechaPartido.toDate()).format('DD/MMM HH:mm');
-    e.activo = moment(e.fechaPartido).add(-10,'minutes') >= moment() ? 0 : 1 ;
+    e.activo = moment(e.fechaPartido.toDate()).add(-10,'days') <= moment() ? 0 : 1 ;//TODO: cambiar days x minutes 
     e.betA = bet.filter(f=>f.partidoID === e.id)[0]?.golesA || 0;
     e.betB = bet.filter(f=>f.partidoID === e.id)[0]?.golesB || 0;
     e.apuestaID = bet.filter(f=>f.partidoID === e.id)[0]?.id;
+    e.puntos = bet.filter(f=>f.partidoID === e.id)[0]?.puntos;
     return e
   })
 
-  const pivotPasado = part.filter(f=>f.activo === 0);
-  const pivotActivos = part.filter(f=>f.activo === 1);
+  let pivotPasado = part.filter(f=>f.activo === 0);
+  let pivotActivos = part.filter(f=>f.activo === 1);
 
   // let respi = resp.sort((a,b)=> new Date(a.fechaPartido).getTime() - new Date(b.fechaPartido).getTime());
-  // let respi = alasql('select * from ? order by ')
+  pivotActivos = alasql('select * from ? order by fechaPartido',[pivotActivos])
   console.log('partidos y apuestas', pivotPasado,pivotActivos);
   setPartidos(pivotPasado);
   setApuestas(pivotActivos);
@@ -85,10 +87,12 @@ const colPartidos = [
   {field:'fechaPartidoStr',headerName:'Fecha Partido', width: 120,editable:false},
   {field:'equipoA',headerName:'Equipo A', width: 150,editable:false},
   {field:'golesA',headerName:'Goles A', width: 70,editable:true,type:'number',min:0,max:9},
-  {field:'betA',headerName:'Goles A', width: 70,editable:true,type:'number',min:0,max:9},
+  {field:'betA',headerName:'Goles A', width: 70,editable:true,type:'number',min:0,max:9}, 
+  // , renderCell :(params)=>{if(params.row.betA === params.row.golesA) return}},
   {field:'equipoB',headerName:'Equipo B', width: 150,editable:false},
   {field:'golesB',headerName:'Goles B', width: 70,editable:true,type:'number'},
   {field:'betB',headerName:'Goles B', width: 70,editable:true,type:'number'},
+  {field:'puntos',headerName:'Puntos', width: 70,type:'number'},
   {field:'id',headerName:'ID'},
   {field:'apuestaID',headerName:'apuestaID'},
   {field:'activo',headerName:'Activo'},
@@ -110,8 +114,10 @@ const colApuestas = [
     },
   },
   {field:'fechaPartidoStr',headerName:'Fecha Partido', width: 120,editable:false},
+  {field: 'image', headerName: 'Image', width: 150, editable: true
+  , renderCell: (params) => <img title={`${params.row.equipoA}`} src={`../assets/${params.row.equipoA}.png`} alt='S/I'/>},
   {field:'equipoA',headerName:'Equipo A', width: 150,editable:false},
-  {field:'betA',headerName:'Apuesta A', width: 70,editable:true,type:'number',min:0,max:9},
+  {field:'betA',headerName:'Goles A', width: 70,editable:true,type:'number',min:0,max:9},
   {field:'equipoB',headerName:'Equipo B', width: 150,editable:false},
   {field:'betB',headerName:'Goles B', width: 70,editable:true,type:'number'},
   {field:'id',headerName:'ID'},
@@ -131,7 +137,13 @@ const colApuestas = [
     <>
       <Navbar/>
       <Box component='main' sx={{backgroundColor:'whitesmoke',height:'100vh',width:'100vw',display:'flex',justifyContent:'center',gap:2}} >
-        <Box sx={{ height: 450, width:{xs:'98vw',md:700},justifyContent:'center',mt:4 }}>
+        <Box sx={{ height: 450, width:{xs:'98vw',md:700},justifyContent:'center',mt:4,
+                '& .acierto': {
+                  backgroundColor: '#dcfae8',
+                },
+                '& .fallo': {
+                  backgroundColor: '#f7cdbc',
+                } }}>
           <Typography variant="h5" sx={{fontWeight:500}} color="primary" >Historial Apuestas</Typography>
           <DataGrid
             rows={partidos}
@@ -141,7 +153,11 @@ const colApuestas = [
             disableSelectionOnClick
             experimentalFeatures={{ newEditingApi: true }}
             columnVisibilityModel={{id:false,apuestaID:false,activo:false}}
-            sortModel={[{field:'fechaPartido'}]}
+            localeText={esES.components.MuiDataGrid.defaultProps.localeText}
+            // sortModel={[{field:'fechaPartido'}]}
+            getCellClassName={(params) => {
+              return params.row.golesA === params.row.betA ? 'acierto' : 'fallo';
+            }}
           />
         </Box>
         <Box sx={{ height: 450, width:{xs:'98vw',md:700},justifyContent:'center',mt:4 }}>
@@ -154,7 +170,8 @@ const colApuestas = [
             disableSelectionOnClick
             experimentalFeatures={{ newEditingApi: true }}
             columnVisibilityModel={{id:false,apuestaID:false,activo:false}}
-            sortModel={[{field:'fechaPartido'}]}
+            // sortModel={[{field:'fechaPartido'}]}
+            localeText={esES.components.MuiDataGrid.defaultProps.localeText}
           />
         </Box>
       </Box>
