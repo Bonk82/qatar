@@ -50,7 +50,7 @@ export const Register = () => {
     try {
       const resp = await signup(data.get('email'),data.get('password'));
       console.log('signup',resp);
-      const newUser = {nombre:data.get('nombre'),tipo:'usuario',estado:'lectura',userID:resp.user?.uid};
+      const newUser = {nombre:data.get('nombre'),tipo:'usuario',estado:'lectura',userID:resp.user?.uid,grupo:'UPRE'};
       await guardar('usuario',newUser);
       navigate('/');
     } catch (error) {

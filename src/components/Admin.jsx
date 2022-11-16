@@ -29,15 +29,6 @@ export const Admin = () => {
       listarPartidos();
   }, [])
 
-
-
-  // const revisarAdmin = async() =>{
-  //   const resp = await listar('usuario')
-  //   const elUser = resp.filter(f=>f.userID === user.uuid)[0]?.tipo;
-  //   console.log('revisAdmin',resp,elUser);
-  //   (elUser!=='administrador' || !elUser ) ? navigate('/'):isAdmin = true; 
-  // }
-
   const onChangeScore = async (e)=>{
     console.log('score',e);
     try {
@@ -87,17 +78,19 @@ export const Admin = () => {
 
   const puntuarApuestas = async (data) =>{
     const apuestas = await listar('apuesta');
+    const factorA = equiposAll.filter(f=>f.nombre === data.equipoA)[0]?.factor;
+    const factorB = equiposAll.filter(f=>f.nombre === data.equipoB)[0]?.factor;
     apuestas.map(e=>{
       let puntaje = 0
       if(data.golesA === e.golesA) puntaje+=1;
       if(data.golesB === e.golesB) puntaje+=1;
       if(data.golesA === e.golesA && data.golesB === e.golesB) puntaje+=1;
-      if(data.golesA > data.golesB && e.golesA > e.golesB) puntaje += 2
-      if(data.golesA < data.golesB && e.golesA < e.golesB) puntaje += 2
+      if(data.golesA > data.golesB && e.golesA > e.golesB) puntaje += (2*factorA)
+      if(data.golesA < data.golesB && e.golesA < e.golesB) puntaje += (2*factorB)
       if(data.golesA === data.golesB && e.golesA === e.golesB) puntaje += 2
       //TODO: agregar la valoracion del factor de equipo y el tiempo antes del partido
       e.puntos = puntaje;
-      console.log('lapuesta',e);
+      console.log('laApuesta',e);
       return e;
     });
 
@@ -124,7 +117,7 @@ export const Admin = () => {
           // return alert(JSON.stringify(thisRow, null, 4));
           onChangeScore(thisRow)
         };
-        return <IconButton onClick={onClick} color='primary' size="large"><SaveAsIcon/></IconButton>;
+        return <IconButton onClick={onClick} color='success' size="large"><SaveAsIcon/></IconButton>;
       },
     },
     {field:'equipoA',headerName:'Equipo A', width: 150,editable:false},

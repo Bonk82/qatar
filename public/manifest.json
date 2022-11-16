@@ -1,25 +1,34 @@
 {
   "short_name": "React App",
-  "name": "Create React App Sample",
+  "name": "Qatar 2022 Bonk",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "./assets/logo.png",
       "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "type": "image/png"
     },
     {
-      "src": "logo192.png",
-      "type": "image/png",
+      "src": "./assets/logo2.jpg",
+      "type": "image/jpg",
       "sizes": "192x192"
     },
     {
-      "src": "logo512.png",
+      "src": "./assets/logo.png",
       "type": "image/png",
       "sizes": "512x512"
     }
   ],
   "start_url": ".",
+  "display_override": ["fullscreen", "minimal-ui"],
   "display": "standalone",
   "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "background_color": "#56042c",
+  "categories":["sports","bet"],
+  "description":"Aplicación para administrar apuestas sobre el mundial Qatar 2022.",
+  "dir":"ltr",
+  "id":"/v1",
+  "lang":"es-ES",
+  "orientation": "portrait",
+  "prefer_related_applications": false,
+  "scope":"/"
 }
