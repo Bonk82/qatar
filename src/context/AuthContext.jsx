@@ -8,7 +8,7 @@ import {
   signInWithPopup,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import { auth } from "../connection/firebase";
+import { auth, listar } from "../connection/firebase";
 
 const authContext = createContext();
 
@@ -39,13 +39,27 @@ export function AuthProvider({ children }) {
 
   const resetPassword = async (email) => sendPasswordResetEmail(auth, email);
 
+  const verRol = async (cu) =>{
+    const usuarios = await listar('usuario')
+    console.log('verrol',usuarios,cu);
+    const rol =  usuarios.filter(f=>f.userID === cu?.uid)[0]?.tipo;
+    const estado =  usuarios.filter(f=>f.userID === cu?.uid)[0]?.estado;
+    const elUser = cu;
+    elUser.rol = rol;
+    elUser.estado = estado;
+    setUser(elUser);
+    setLoading(false);
+  } 
+
   useEffect(() => {
     const unsubuscribe = onAuthStateChanged(auth, (currentUser) => {
       console.log({ currentUser });
-      setUser(currentUser);
-      setLoading(false);
+      // setUser(currentUser);
+      verRol(currentUser);
+      // setLoading(false);
     });
     return () => unsubuscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
