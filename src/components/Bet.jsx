@@ -115,7 +115,7 @@ const colApuestas = [
   },
   {field:'fechaPartidoStr',headerName:'Fecha Partido', width: 120,editable:false},
   {field: 'image', headerName: 'Image', width: 150, editable: true
-  , renderCell: (params) => <img title={`${params.row.equipoA}`} src={`../assets/${params.row.equipoA}.png`} alt='S/I'/>},
+  , renderCell: (params) => <img sizes="" title={`${params.row.equipoA}`} src={`../assets/${params.row.equipoA}.png`} alt='S/I'/>},
   {field:'equipoA',headerName:'Equipo A', width: 150,editable:false},
   {field:'betA',headerName:'Goles A', width: 70,editable:true,type:'number',min:0,max:9},
   {field:'equipoB',headerName:'Equipo B', width: 150,editable:false},
