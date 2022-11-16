@@ -14,7 +14,6 @@ import { useNavigate } from 'react-router-dom';
 import { Alert } from '@mui/material';
 import { useState } from 'react';
 import { guardar } from '../connection/firebase';
-import { TextFieldsSharp } from '@mui/icons-material';
 
 function Copyright(props) {
   return (

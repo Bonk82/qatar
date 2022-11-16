@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getFirestore,collection, addDoc,getDocs, getDoc, deleteDoc,doc, updateDoc, serverTimestamp, query, orderBy, limit   } from "firebase/firestore";
+// import { getAnalytics } from "firebase/analytics";
+import { getFirestore,collection, addDoc,getDocs, getDoc, deleteDoc,doc, updateDoc, serverTimestamp} from "firebase/firestore";
 import {createUserWithEmailAndPassword, getAuth} from 'firebase/auth'
 
 

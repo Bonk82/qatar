@@ -6,7 +6,7 @@ import alasql from "alasql";
 import moment from "moment";
 import { useEffect } from "react";
 import { useState } from "react"
-import { actualizar, guardar, listar, listarEquipos } from "../connection/firebase";
+import { actualizar, guardar, listar } from "../connection/firebase";
 import { Navbar } from "./Navbar"
 import SaveAsIcon from '@mui/icons-material/SaveAs';
 import { useAuth } from "../context/AuthContext";
@@ -17,7 +17,11 @@ let equiposAll = [];
 export const Admin = () => {
   const {user } = useAuth();
   const navigate = useNavigate();
- const [isAdmin, setIsAdmin] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [partidos, setPartidos] = useState([])
+  const [equipos, setEquipos] = useState([]);
+  const [partido, setPartido] = useState({equipoA:'',golesA:0,equipoB:'',golesB:0,fechaPartido:moment().toDate().setMinutes(0),finalizado:false});
+  const [alerta, setAlerta] = useState([false,'success','']);
 
   useEffect(() => {
     (user.rol !== 'administrador') ? navigate('/'): setIsAdmin(true);
@@ -37,9 +41,10 @@ export const Admin = () => {
       await actualizarPuntuacion(e);
       await puntuarApuestas(e);
       console.log('ya se actualizo');
-      setAlerta(true,'success','Marcador actualizado con éxito!')
     } catch (error) {
       setAlerta(true,'danger','Marcador actualizado con éxito!')
+    } finally{
+      setAlerta(true,'success','Marcador actualizado con éxito!')
     }
   }
 
@@ -102,36 +107,33 @@ export const Admin = () => {
         console.log(error);
       }
     });
-
   }
 
   const colPartidos = [
     {field: 'Acciones', headerName: 'Acciones', sortable: false, width:80,
       renderCell: (params) => {
-        const onClick = (e) => {
-          // e.stopPropagation(); // don't select this row after clicking
-          const api = params.api;
-          const thisRow = {};
-          api.getAllColumns().filter((c) => c.field !== '__check__' && !!c)
-            .forEach((c) => (thisRow[c.field] = params.getValue(params.id, c.field)));
-          // return alert(JSON.stringify(thisRow, null, 4));
-          onChangeScore(thisRow)
-        };
-        return <IconButton onClick={onClick} color='success' size="large"><SaveAsIcon/></IconButton>;
+        return <IconButton onClick={()=>onChangeScore(params.row)} title='Actualizar Score' color='success'><SaveAsIcon fontSize="large"/></IconButton>;
       },
     },
-    {field:'equipoA',headerName:'Equipo A', width: 150,editable:false},
-    {field:'golesA',headerName:'Goles A', width: 70,editable:true,type:'number',min:0,max:9},
-    {field:'equipoB',headerName:'Equipo B', width: 150,editable:false},
-    {field:'golesB',headerName:'Goles B', width: 70,editable:true,type:'number'},
+    {field:'equipoA',headerName:'Equipo', minWidth:110, flex:0.5, align:'center'
+    , renderCell: (params) =><figure style={{textAlign:'center'}}>
+      <img title={`${params.row.equipoA}`} width='70' src={`../assets/${params.row.equipoA}.png`} alt='X'/>
+      <figcaption>{`${params.row.equipoA}`}</figcaption>
+    </figure>},
+    {field:'golesA',headerName:'Goles', width: 70,editable:true,type:'number',min:0,max:9,align:'center', renderCell:(params)=>{
+      return <Typography variant="h3">{params.row.golesA}</Typography>
+    }},
+    {field:'equipoB',headerName:'Equipo', minWidth:110, flex:0.5, align:'center'
+    , renderCell: (params) =><figure style={{textAlign:'center'}}>
+      <img title={`${params.row.equipoB}`} width='70' src={`../assets/${params.row.equipoB}.png`} alt='X'/>
+      <figcaption>{`${params.row.equipoB}`}</figcaption>
+    </figure>},
+    {field:'golesB',headerName:'Goles', width: 70,editable:true,type:'number',min:0,max:9,align:'center', renderCell:(params)=>{
+      return <Typography variant="h3">{params.row.golesB}</Typography>
+    }},
     {field:'fechaPartidoStr',headerName:'Fecha Partido', width: 120,editable:false},
     {field:'id',headerName:'ID'},
   ]
-  
-  const [partidos, setPartidos] = useState([])
-  const [equipos, setEquipos] = useState([]);
-  const [partido, setPartido] = useState({equipoA:'',golesA:0,equipoB:'',golesB:0,fechaPartido:moment().toDate().setMinutes(0),finalizado:false});
-  const [alerta, setAlerta] = useState([false,'success','']);
 
   const cargarEquipos = async () =>{
     let resp = await listar('equipo');
@@ -195,7 +197,7 @@ export const Admin = () => {
   }
 
   const slideAlert = (props) => {
-    return <Slide {...props} direction="down" />;
+    return <Slide {...props} direction="up" />;
   }
 
 
@@ -204,8 +206,8 @@ export const Admin = () => {
     <Navbar/>
     {isAdmin && 
     <Box component='main' sx={{backgroundColor:'whitesmoke',height:'100vh',width:'100vw',display:'flex',flexDirection:{xs:'column',md:'row'},justifyContent:'center',gap:2}} >
-      <Box component="form" onSubmit={handleSubmit} noValidate sx={{alignItems:'center',width:{xs:'100vw',md:700},mt:2}}>
-        <Typography variant="h5" color='primary'>Registro de Partidos</Typography>
+      <Box component="form" onSubmit={handleSubmit} noValidate sx={{alignItems:'center',width:{xs:'100vw',md:700},mt:2,paddingX:1}}>
+        <Typography variant="h5" color='primary' sx={{fontWeight:500,backgroundColor:'secondary.main',borderRadius:2,pl:4}}>Registro de Partidos</Typography>
         <FormGroup>
           <FormControlLabel control={<Checkbox id="faseGrupos" defaultChecked />} label="Fase de grupos" />
         </FormGroup>
@@ -262,8 +264,8 @@ export const Admin = () => {
         </Box>
         <Button type="submit" fullWidth variant="contained" sx={{ mt: 3}}>Registrar</Button>
       </Box>
-      <Box sx={{ height: 450, width:{xs:'98vw',md:700},justifyContent:'center',mt:2 }}>
-        <Typography variant="h5" color='primary'>Actualización de Resultados</Typography>
+      <Box sx={{ height: 450, width:{xs:'100vw',md:700},justifyContent:'center',mt:2,paddingX:1 }}>
+        <Typography variant="h5" color='primary' sx={{fontWeight:500,backgroundColor:'secondary.main',borderRadius:2,pl:4,mb:1}}>Actualización de Resultados</Typography>
         <DataGrid
           rows={partidos}
           columns={colPartidos}
@@ -272,13 +274,14 @@ export const Admin = () => {
           disableSelectionOnClick
           experimentalFeatures={{ newEditingApi: true }}
           columnVisibilityModel={{id:false}}
+          rowHeight={80}
           // sortModel={[{field:'fechaPartido'}]}
           localeText={esES.components.MuiDataGrid.defaultProps.localeText}
         />
       </Box>
     </Box>
     }
-    <Snackbar onClose={handleClose} open={alerta[0]} TransitionComponent={slideAlert} autoHideDuration={3000} anchorOrigin={{vertical:'top',horizontal:'right'}}>
+    <Snackbar onClose={handleClose} open={alerta[0]} TransitionComponent={slideAlert} autoHideDuration={6000} anchorOrigin={{vertical:'top',horizontal:'right'}}>
       <Alert severity={alerta[1]} sx={{ width: '100%' }}> {alerta[2]}</Alert>
     </Snackbar>
     </>

@@ -68,6 +68,11 @@ legend span{
 }
 
 
+/*para apex charts*/
+.apexcharts-tooltip {
+  background: #444343;
+  color: #56042c;
+}
 
 
 @keyframes App-logo-spin {

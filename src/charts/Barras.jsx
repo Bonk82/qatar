@@ -5,6 +5,7 @@ export const Barras = ({data}) => {
   console.log(data);
   useEffect(() => {
     recargarData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
   
   const [chartBar, setChartBar] = useState({options:{},series:[]});
@@ -16,12 +17,27 @@ export const Barras = ({data}) => {
         id: "basic-bar"
       },
       xaxis: {
-        categories: data.x //[1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999]
+        categories: data.x, //[1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999]
+        title:{
+          text:data.titulos?.x,
+          offsetY: 80,
+        }
+      },
+      yaxis:{
+        title:{
+          text:data.titulos?.y
+        }
       },
       theme: {
         mode: 'light', 
         palette: 'palette7', 
       },
+      title:{
+        text:data.titulos?.c,
+      },
+      tooltip:{
+        theme:'dark',
+      }
     }
   
     const series = [

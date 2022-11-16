@@ -44,10 +44,10 @@ export function AuthProvider({ children }) {
     console.log('verrol',usuarios,cu);
     const elUser = cu;
     if(cu){
-      const rol =  usuarios.filter(f=>f.userID === cu?.uid)[0]?.tipo;
-      const estado =  usuarios.filter(f=>f.userID === cu?.uid)[0]?.estado;
-      elUser.rol = rol;
-      elUser.estado = estado;
+      const usuario = usuarios.filter(f=>f.userID === cu?.uid)[0];
+      elUser.rol = usuario?.tipo;
+      elUser.estado = usuario?.estado;
+      elUser.grupo = usuario?.grupo;
     }
     setUser(elUser);
     setLoading(false);

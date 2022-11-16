@@ -1,4 +1,4 @@
-import { Box, Button, ToggleButton, ToggleButtonGroup } from "@mui/material"
+import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material"
 import { DataGrid ,esES} from "@mui/x-data-grid";
 import alasql from "alasql";
 import moment from "moment";
@@ -41,11 +41,19 @@ export const Info = () => {
         //                   .sort((a,b)=>new Date(a.fechaPartido).getTime() - new Date(b.fechaPartido).getTime());
         filas = alasql('select * from ? where finalizado = true order by fechaPartido',[resultados])
         columnas = [
-          {field:'fechaPartidoStr',headerName:'Fecha', width:240},
-          {field:'equipoA',headerName:'Equipo', width:240},
-          {field:'golesA',headerName:'Goles', width:240},
-          {field:'equipoB',headerName:'Equipo', width:240},
-          {field:'golesB',headerName:'Goles', width:240},
+          {field:'fechaPartidoStr',headerName:'Fecha', minWidth:120},
+          {field:'equipoA',headerName:'Equipo', minWidth:110, flex:0.5, align:'center'
+          , renderCell: (params) =><figure>
+            <img title={`${params.row.equipoA}`} width='70' src={`../assets/${params.row.equipoA}.png`} alt='X'/>
+            <figcaption>{`${params.row.equipoA}`}</figcaption>
+          </figure>},
+          {field:'golesA',headerName:'Goles', width:70 ,type:'number'},
+          {field:'equipoB',headerName:'Equipo',minWidth:110, flex:0.5, align:'center'
+          , renderCell: (params) => <figure>
+            <img title={`${params.row.equipoB}`} width='70' src={`../assets/${params.row.equipoB}.png`} alt='X'/>
+            <figcaption>{`${params.row.equipoB}`}</figcaption>
+          </figure>},
+          {field:'golesB',headerName:'Goles', width:70 ,type:'number'},
         ] ;
         orden=[{field:'fechaPartido'}];
       }
@@ -54,16 +62,20 @@ export const Info = () => {
         filas = alasql('select * from ? order by grupo,puntos desc,diferencia desc',[resultados])
         console.log(filas);
         columnas = [
-          {field:'grupo',headerName:'Grupo', width: 80},
-          {field:'nombre',headerName:'Equipo', width:240},
-          {field:'jugados',headerName:'PJ', width: 80},
-          {field:'ganados',headerName:'PG', width: 80},
-          {field:'empatados',headerName:'PE', width: 80},
-          {field:'perdidos',headerName:'PP', width: 80},
-          {field:'favor',headerName:'GF', width: 80},
-          {field:'contra',headerName:'GC', width: 80},
-          {field:'diferencia',headerName:'GD', width: 80},
-          {field:'puntos',headerName:'PTS', width: 80},
+          {field:'grupo',headerName:'Grupo', width: 70},
+          {field:'nombre',headerName:'Equipo', minWidth:110, flex:1, align:'center'
+          , renderCell: (params) =><figure>
+            <img title={`${params.row.nombre}`} width='70' src={`../assets/${params.row.nombre}.png`} alt='X'/>
+            <figcaption>{`${params.row.nombre}`}</figcaption>
+          </figure>},
+          {field:'jugados',headerName:'PJ', width: 70,type:'number'},
+          {field:'ganados',headerName:'PG', width: 70,type:'number'},
+          {field:'empatados',headerName:'PE', width: 70,type:'number'},
+          {field:'perdidos',headerName:'PP', width: 70,type:'number'},
+          {field:'favor',headerName:'GF', width: 70,type:'number'},
+          {field:'contra',headerName:'GC', width: 70,type:'number'},
+          {field:'diferencia',headerName:'GD', width: 70,type:'number'},
+          {field:'puntos',headerName:'PTS', width: 70,type:'number'},
         ] ;
         orden=[{field:'pts',sort:'desc'}];
       }
@@ -71,7 +83,11 @@ export const Info = () => {
         resultados = await listar('equipo');
         filas = resultados;
         columnas = [
-          {field:'nombre',headerName:'Equipo', width:270},
+          {field:'nombre',headerName:'Equipo', minWidth:110, flex:1, align:'center'
+          , renderCell: (params) =><figure>
+            <img title={`${params.row.nombre}`} width='70' src={`../assets/${params.row.nombre}.png`} alt='X'/>
+            <figcaption>{`${params.row.nombre}`}</figcaption>
+          </figure>},
           {field:'factor',headerName:'Factor', width: 100},
         ] ;
       }
@@ -102,6 +118,7 @@ export const Info = () => {
               rowsPerPageOptions={[10]}
               disableSelectionOnClick
               autoHeight
+              rowHeight={80}
               experimentalFeatures={{ newEditingApi: true }}
               localeText={esES.components.MuiDataGrid.defaultProps.localeText}
               // sortModel={grilla.orden}

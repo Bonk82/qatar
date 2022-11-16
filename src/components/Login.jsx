@@ -37,7 +37,7 @@ export const Login = () => {
   const [error, setError] = useState();
   const {login, loginWithGoogle, resetPassword}= useAuth();
   const navigate = useNavigate();
-  const logeado = useAuth();
+  // const logeado = useAuth();
 
   //mejor opcion para ir setenado los valores de cada control del form 
   // const handleChange = ({ target: { value, name } }) => setUser({ ...user, [name]: value });
@@ -83,7 +83,7 @@ export const Login = () => {
     if (!user.email) return setError("Escribe un email valido");
     try {
       await resetPassword(user.email);
-      setError('Ya te enviamso el correo, por favor revisa tus bandejas')
+      setError('Ya te enviamos el correo, por favor revisa tus bandejas')
     } catch (error) {
       setError(error.message);
     }

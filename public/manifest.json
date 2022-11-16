@@ -1,6 +1,6 @@
 {
   "short_name": "React App",
-  "name": "Qatar 2022 Bonk",
+  "name": "Qatar 2022 ©",
   "icons": [
     {
       "src": "./assets/logo.png",
@@ -28,7 +28,7 @@
   "dir":"ltr",
   "id":"/v1",
   "lang":"es-ES",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
   "prefer_related_applications": false,
   "scope":"/"
 }

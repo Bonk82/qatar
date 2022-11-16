@@ -2,8 +2,6 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.css';
 import { Admin } from './components/Admin';
 import { Bet } from './components/Bet';
-import { Dashboard } from './components/Dashboard';
-import { Home } from './components/Home';
 import { Info } from './components/Info';
 import { Login } from './components/Login';
 import { ProtectedRoute } from './components/ProtectedRoute';

@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { actualizar, guardar, listar } from "../connection/firebase";
 import { useAuth } from "../context/AuthContext";
 import { Navbar } from "./Navbar"
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PaidIcon from '@mui/icons-material/Paid';
 import alasql from "alasql";
 
@@ -65,37 +64,49 @@ const listarPartidos = async()=>{
 }
 
 const colPartidos = [
-  {field:'fechaPartidoStr',headerName:'Fecha Partido', width: 120,editable:false},
-  {field:'equipoA',headerName:'Equipo A', width: 150,editable:false},
-  {field: 'imageA', headerName: 'EquipoA', width: 100, editable: false
-  , renderCell: (params) => <img title={`${params.row.equipoA}`} width='70px' src={`../assets/${params.row.equipoA}.png`} alt='S/I'/>},
-  {field:'golesA',headerName:'Goles A', width: 70,editable:true,type:'number',min:0,max:9},
-  {field:'betA',headerName:'Apuesta A', width: 70,editable:true,type:'number',min:0,max:9},
-  {field:'equipoB',headerName:'Equipo B', width: 150,editable:false},
-  {field: 'imageB', headerName: 'EquipoA', width: 100, editable: false
-  , renderCell: (params) => <img title={`${params.row.equipoB}`} width='70px' src={`../assets/${params.row.equipoB}.png`} alt='S/I'/>},
-  {field:'golesB',headerName:'Goles B', width: 70,editable:true,type:'number'},
-  {field:'betB',headerName:'Apuesta B', width: 70,editable:true,type:'number'},
   {field:'puntos',headerName:'Puntos', width: 70,type:'number'},
+  {field:'equipoA',headerName:'Equipo', minWidth:110, flex:0.5, align:'center'
+  , renderCell: (params) =><figure>
+    <img title={`${params.row.equipoA}`} width='70' src={`../assets/${params.row.equipoA}.png`} alt='X'/>
+    <figcaption>{`${params.row.equipoA}`}</figcaption>
+  </figure>},
+  {field:'golesA',headerName:'Goles', width: 70,type:'number',min:0,max:9},
+  {field:'betA',headerName:'Apostado', width: 70,type:'number',min:0,max:9},
+  {field:'equipoB',headerName:'Equipo', minWidth:110, flex:0.5, align:'center'
+  , renderCell: (params) =><figure>
+    <img title={`${params.row.equipoB}`} width='70' src={`../assets/${params.row.equipoB}.png`} alt='X'/>
+    <figcaption>{`${params.row.equipoB}`}</figcaption>
+  </figure>},
+  {field:'golesB',headerName:'Goles', width: 70,type:'number'},
+  {field:'betB',headerName:'Apostado', width: 70,type:'number'},
+  {field:'fechaPartidoStr',headerName:'Fecha Partido', width: 120},
   {field:'id',headerName:'ID'},
   {field:'apuestaID',headerName:'apuestaID'},
   {field:'activo',headerName:'Activo'},
 ]
 const colApuestas = [
-  {field: 'Acciones', headerName: 'Acciones', sortable: false, width:80,
+  {field: 'Apostar', headerName: 'Apostar', sortable: false, width:80,
     renderCell: (params) => {
-      return <IconButton onClick={()=>onApuesta(params.row)} title='Apostar' color='primary' size="large"><PaidIcon/></IconButton>;
+      return <IconButton onClick={()=>onApuesta(params.row)} title='Apostar' color='success'><PaidIcon fontSize="large"/></IconButton>;
     },
   },
+  {field:'equipoA',headerName:'Equipo', minWidth:110, flex:0.5, align:'center'
+  , renderCell: (params) =><figure style={{textAlign:'center'}}>
+    <img title={`${params.row.equipoA}`} width='70' src={`../assets/${params.row.equipoA}.png`} alt='X'/>
+    <figcaption>{`${params.row.equipoA}`}</figcaption>
+  </figure>},
+  {field:'betA',headerName:'Goles', width: 70,editable:true,type:'number',min:0,max:9,align:'center', renderCell:(params)=>{
+    return <Typography variant="h3">{params.row.betA}</Typography>
+  }},
+  {field:'equipoB',headerName:'Equipo', minWidth:110, flex:0.5, align:'center'
+  , renderCell: (params) =><figure style={{textAlign:'center'}}>
+    <img title={`${params.row.equipoB}`} width='70' src={`../assets/${params.row.equipoB}.png`} alt='X'/>
+    <figcaption>{`${params.row.equipoB}`}</figcaption>
+  </figure>},
+  {field:'betB',headerName:'Goles', width: 70,editable:true,type:'number', renderCell:(params)=>{
+    return <Typography variant="h3">{params.row.betB}</Typography>
+  }},
   {field:'fechaPartidoStr',headerName:'Fecha Partido', width: 120,editable:false},
-  {field: 'imageA', headerName: 'EquipoA', width: 100, editable: false
-  , renderCell: (params) => <img title={`${params.row.equipoA}`} width='70px' src={`../assets/${params.row.equipoA}.png`} alt='S/I'/>},
-  {field:'equipoA',headerName:'Equipo A', width: 150,editable:false},
-  {field:'betA',headerName:'Goles A', width: 70,editable:true,type:'number',min:0,max:9},
-  {field: 'imageB', headerName: 'EquipoB', width: 100, editable: false
-  , renderCell: (params) => <img title={`${params.row.equipoB}`} width='70px' src={`../assets/${params.row.equipoB}.png`} alt='S/I'/>},
-  {field:'equipoB',headerName:'Equipo B', width: 150,editable:false},
-  {field:'betB',headerName:'Goles B', width: 70,editable:true,type:'number'},
   {field:'id',headerName:'ID'},
   {field:'apuestaID',headerName:'apuestaID'},
   {field:'activo',headerName:'Activo'},
@@ -106,24 +117,34 @@ const colApuestas = [
   }
 
   const slideAlert = (props) => {
-    return <Slide {...props} direction="down" />;
+    return <Slide {...props} direction="up" />;
   }
 
   return (
     <>
       <Navbar/>
-      <Box component='main' sx={{backgroundColor:'whitesmoke',height:'100vh',width:'100vw',display:'flex',justifyContent:'center',gap:2}} >
-        <Box sx={{ height: 450, width:{xs:'98vw',md:700},justifyContent:'center',mt:4,
-                '& .gana1': {
-                  backgroundColor: '#a5f2b3',
-                },
-                '& .gana3': {
-                  backgroundColor: '#52e36c',
-                },
-                '& .gana5': {
-                  backgroundColor: '#18d93a',
-                } }}>
-          <Typography variant="h5" sx={{fontWeight:500}} color="primary" >Historial Apuestas</Typography>
+      <Box component='main' sx={{backgroundColor:'whitesmoke',height:'100vh',width:'100vw',display:'flex',flexDirection:{xs:'column',md:'row'},justifyContent:'center',gap:2}} >
+        <Box sx={{ height: 700, width:{xs:'98vw',md:700},justifyContent:'center',mt:3,paddingX:1 }}>
+          <Typography variant="h5" sx={{fontWeight:500,backgroundColor:'secondary.main',borderRadius:2,pl:4}} color="primary" >Apuestas disponibles</Typography>
+          <DataGrid
+            rows={apuestas}
+            columns={colApuestas}
+            pageSize={10}
+            rowsPerPageOptions={[10]}
+            disableSelectionOnClick
+            rowHeight={80}
+            experimentalFeatures={{ newEditingApi: true }}
+            columnVisibilityModel={{id:false,apuestaID:false,activo:false}}
+            // sortModel={[{field:'fechaPartido'}]}
+            localeText={esES.components.MuiDataGrid.defaultProps.localeText}
+          />
+        </Box>
+        <Box sx={{ height: 700, width:{xs:'98vw',md:700},justifyContent:'center',mt:3, paddingX:1,
+                '& .gana1': {backgroundColor: '#a5f2b3',}
+                ,'& .gana3': { backgroundColor: '#52e36c',}
+                ,'& .gana5': { backgroundColor: '#18d93a',}
+                }}>
+          <Typography variant="h5" sx={{fontWeight:500,backgroundColor:'secondary.main',borderRadius:2,pl:4}} color="primary" >Historial de tus Apuestas</Typography>
           <DataGrid
             rows={partidos}
             columns={colPartidos}
@@ -131,7 +152,8 @@ const colApuestas = [
             rowsPerPageOptions={[10]}
             disableSelectionOnClick
             experimentalFeatures={{ newEditingApi: true }}
-            columnVisibilityModel={{id:false,apuestaID:false,activo:false,equipoA:false,equipoB:false}}
+            rowHeight={80}
+            columnVisibilityModel={{id:false,apuestaID:false,activo:false}}
             localeText={esES.components.MuiDataGrid.defaultProps.localeText}
             // sortModel={[{field:'fechaPartido'}]}
             getCellClassName={(params) => {
@@ -139,22 +161,8 @@ const colApuestas = [
             }}
           />
         </Box>
-        <Box sx={{ height: 450, width:{xs:'98vw',md:700},justifyContent:'center',mt:4 }}>
-          <Typography variant="h5" sx={{fontWeight:500}} color="primary" >Apuestas disponibles</Typography>
-          <DataGrid
-            rows={apuestas}
-            columns={colApuestas}
-            pageSize={10}
-            rowsPerPageOptions={[10]}
-            disableSelectionOnClick
-            experimentalFeatures={{ newEditingApi: true }}
-            columnVisibilityModel={{id:false,apuestaID:false,activo:false,equipoA:false,equipoB:false}}
-            // sortModel={[{field:'fechaPartido'}]}
-            localeText={esES.components.MuiDataGrid.defaultProps.localeText}
-          />
-        </Box>
       </Box>
-      <Snackbar onClose={handleClose} open={alerta[0]} TransitionComponent={slideAlert} autoHideDuration={3000} anchorOrigin={{vertical:'top',horizontal:'right'}}>
+      <Snackbar onClose={handleClose} open={alerta[0]} TransitionComponent={slideAlert} autoHideDuration={6000} anchorOrigin={{vertical:'top',horizontal:'right'}}>
         <Alert severity={alerta[1]} sx={{ width: '100%' }}> {alerta[2]}</Alert>
       </Snackbar>
     </>
