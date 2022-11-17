@@ -42,9 +42,9 @@ export const Admin = () => {
       await puntuarApuestas(e);
       console.log('ya se actualizo');
     } catch (error) {
-      setAlerta(true,'danger','Marcador actualizado con éxito!')
+      setAlerta([true,'danger','Marcador actualizado con éxito!'])
     } finally{
-      setAlerta(true,'success','Marcador actualizado con éxito!')
+      setAlerta([true,'success','Marcador actualizado con éxito!'])
     }
   }
 
@@ -193,7 +193,7 @@ export const Admin = () => {
   };
 
   const handleClose = ()=>{
-    setAlerta(false);
+    setAlerta([false,'success','vacio']);
   }
 
   const slideAlert = (props) => {

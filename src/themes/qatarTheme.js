@@ -19,7 +19,10 @@ export const qatarTheme = createTheme({
         },
         info:{
             main:purple[300]
-        }
+        },
+        persist: {
+            main: '#56042c'
+        },
     },
     typography:{
         fontFamily:['monospace','arial'],

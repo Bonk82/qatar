@@ -58,7 +58,8 @@ export const Login = () => {
     } catch (error) {
       console.log(error.code,error.message);
       // if(error.code === 'auth/user-not-found') setError('Usuario no registrado!');
-      setError('Correo o Contraseña Incorrectos!');
+      // setError('Correo o Contraseña Incorrectos!');
+      (error.code === 'auth/too-many-requests' )? setError('Si no recuerdas tu contraseña, da clic en Olvidaste tu Contraseña'):setError('Correo o Contraseña Incorrectos!');
     }
   };
 
@@ -127,10 +128,10 @@ export const Login = () => {
               id="password"
               autoComplete="current-password"
             />
-            <FormControlLabel
+            {/* <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Recordarme"
-            />
+            /> */}
             <Button
               type="submit"
               fullWidth
@@ -141,11 +142,11 @@ export const Login = () => {
             </Button>
             <Button type='button' title='Iniciar con tu cuenta Google' fullWidth onClick={handleGoogleSignin} variant="outlined" sx={{ mt: 1, mb: 2 }}><Google/> oogle</Button>
             <Grid container>
-              {/* <Grid item xs>
-                <Link href="#" variant="body2">
+              <Grid item xs>
+                <Link onClick={handleResetPassword} variant="body2">
                   Olvidaste tu Contraseña
                 </Link>
-              </Grid> */}
+              </Grid>
               <Grid item>
                 <Link href="/register" variant="body2">
                   {"No tienes cuenta? Regístrate"}

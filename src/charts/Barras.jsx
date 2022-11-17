@@ -16,6 +16,11 @@ export const Barras = ({data}) => {
       chart: {
         id: "basic-bar"
       },
+      plotOptions: {
+        bar: {
+          distributed: true
+        }
+      },
       xaxis: {
         categories: data.x, //[1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999]
         title:{

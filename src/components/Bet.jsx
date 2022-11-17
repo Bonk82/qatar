@@ -1,4 +1,4 @@
-import { Alert, Box, IconButton, Slide, Snackbar, Typography } from "@mui/material"
+import { Alert, Box, IconButton, Slide, Snackbar, TextField, Typography } from "@mui/material"
 import { DataGrid, esES } from "@mui/x-data-grid"
 import moment from "moment";
 import { useEffect, useState } from "react";
@@ -28,14 +28,14 @@ const onApuesta = async (e)=>{
     if(e.apuestaID){
       await actualizar('apuesta',e.apuestaID,nuevoObj);
       console.log('apuesta actualizada',nuevoObj);
-      setAlerta(true,'success','Apuesta actualizada, suerte!')
+      setAlerta([true,'success','Apuesta actualizada, suerte!'])
     }else{
       await guardar('apuesta',nuevoObj);
       console.log('apuesta registrada',nuevoObj);
-      setAlerta(true,'success','Apuesta registrada, suerte!')
+      setAlerta([true,'success','Apuesta registrada, suerte!'])
     }
   } catch (error) {
-    setAlerta(true,'danger','No se pudo registrar tu apuesta')
+    setAlerta([true,'danger','No se pudo registrar tu apuesta'])
   }
 }
 
@@ -95,7 +95,7 @@ const colApuestas = [
     <img title={`${params.row.equipoA}`} width='70' src={`../assets/${params.row.equipoA}.png`} alt='X'/>
     <figcaption>{`${params.row.equipoA}`}</figcaption>
   </figure>},
-  {field:'betA',headerName:'Goles', width: 70,editable:true,type:'number',min:0,max:9,align:'center', renderCell:(params)=>{
+  {field:'betA',headerName:'Goles', width: 100,editable:true,type:'number',min:0,max:9,align:'center', renderCell:(params)=>{
     return <Typography variant="h3">{params.row.betA}</Typography>
   }},
   {field:'equipoB',headerName:'Equipo', minWidth:110, flex:0.5, align:'center'
@@ -113,7 +113,7 @@ const colApuestas = [
 ]
 
   const handleClose = ()=>{
-    setAlerta(false);
+    setAlerta([false,'success','vacio']);
   }
 
   const slideAlert = (props) => {
@@ -125,7 +125,7 @@ const colApuestas = [
       <Navbar/>
       <Box component='main' sx={{backgroundColor:'whitesmoke',height:'100vh',width:'100vw',display:'flex',flexDirection:{xs:'column',md:'row'},justifyContent:'center',gap:2}} >
         <Box sx={{ height: 700, width:{xs:'98vw',md:700},justifyContent:'center',mt:3,paddingX:1 }}>
-          <Typography variant="h5" sx={{fontWeight:500,backgroundColor:'secondary.main',borderRadius:2,pl:4}} color="primary" >Apuestas disponibles</Typography>
+          <Typography variant="h5" sx={{fontWeight:500,backgroundColor:'secondary.main',color:'persist.main',borderRadius:2,pl:4}} >Apuestas disponibles</Typography>
           <DataGrid
             rows={apuestas}
             columns={colApuestas}
@@ -144,7 +144,7 @@ const colApuestas = [
                 ,'& .gana3': { backgroundColor: '#52e36c',}
                 ,'& .gana5': { backgroundColor: '#18d93a',}
                 }}>
-          <Typography variant="h5" sx={{fontWeight:500,backgroundColor:'secondary.main',borderRadius:2,pl:4}} color="primary" >Historial de tus Apuestas</Typography>
+          <Typography variant="h5" sx={{fontWeight:500,backgroundColor:'secondary.main',color:'primary.main',borderRadius:2,pl:4}} >Historial de tus Apuestas</Typography>
           <DataGrid
             rows={partidos}
             columns={colPartidos}

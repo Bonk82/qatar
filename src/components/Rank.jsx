@@ -25,18 +25,20 @@ export const Rank = () => {
     const usuarios = await listar('usuario');
     const partidos = await listar('partido');
     historialAll = alasql(`select a.golesA betA,a.golesB betB, a.uid id,a.puntos,u.nombre,u.estado,p.equipoA,p.equipoB,p.fechaPartido.toDate() fechaPartido
-    ,p.golesA,p.golesB from ? u left join ? a on a.uid = u.userID inner join ? p on p.id = a.partidoID`,[usuarios,apuestas,partidos]);
-    const apostadoresAll = alasql(`select u.nombre,a.uid id,sum(a.puntos)puntos from ? a inner join ? u on a.uid = u.userID
-    where u.estado = 'apuesta' group by u.nombre,a.uid order by a.puntos desc`,[apuestas,usuarios]);
-    console.log(apostadoresAll,historialAll);
+    ,p.golesA,p.golesB from ? u inner join ? a on u.userID =  a.uid inner join ? p on p.id = a.partidoID where u.estado = 'apuesta'`,[usuarios,apuestas,partidos]);
+
+    const apostadoresAll = await alasql('SELECT nombre,id,SUM(puntos)puntos from ? GROUP BY nombre,id order by 3 desc',[historialAll]);
+    // const rr = alasql('SELECT nombre,id,SUM(puntos)puntos from ? GROUP BY nombre,id',[historialAll]);
+    //console.log('apostadores',apostadoresAll,historialAll,apuestas,usuarios,partidos,rr);
+    console.log('ver',apostadoresAll);
     setApostadores(apostadoresAll);
-    cargarDataChart(apostadoresAll)
+    cargarDataChart()
   }
 
   const cargarHistorial = async(row) =>{
     console.log(row);
     const historialUsuario = historialAll.filter(f=>f.uid === row.id)
-    console.log(historialUsuario);
+    console.log(historialUsuario,apostadores);
   }
 
   const colApostadores = [
@@ -50,24 +52,22 @@ export const Rank = () => {
     {field:'id',headerName:'ID', width: 80},
   ]
 
-  const cargarDataChart = (data)=>{
-    data = data.sort((a,b)=>a.nombre = b.nombre);
-    console.log('cargaChart',data);
-    const apostadores = [];
-    const puntos = [];
-    data.forEach(d => {
-      apostadores.push(d.nombre);
-      puntos.push(d.puntos);
+  const cargarDataChart = ()=>{
+    const users = [];
+    const pts = [];
+    apostadores.forEach(d => {
+      users.push(d.nombre);
+      pts.push(d.puntos);
     });
-    setDataChart({x:apostadores,y:puntos,titulos:{x:'Participantes',y:'Puntos',c:'Ranking de Apostadores'}})
+    setDataChart({x:users,y:pts,titulos:{x:'Participantes',y:'Puntos Obtenidos',c:'Ranking de Apostadores'}})
   }
 
   return (
     <>
       <Navbar/>
       <Box component='main' sx={{backgroundColor:'whitesmoke',height:'100vh',width:'100vw',display:'flex',flexDirection:{xs:'column',md:'row'},justifyContent:'center',gap:2}} >
-        <Box sx={{ height: 450, width:{xs:'100vw',md:320},justifyContent:'center',mt:2,paddingX:4 }}>
-          <Typography variant="h5" color='primary' sx={{fontWeight:500,backgroundColor:'secondary.main',borderRadius:2,pl:4}} >Ranking</Typography>
+        <Box sx={{ height:{xs:400, md:550}, width:{xs:'100vw',md:350},justifyContent:'center',mt:2,paddingX:4 }}>
+          <Typography variant="h5" color='persist.main' sx={{fontWeight:500,backgroundColor:'secondary.main',borderRadius:2,pl:4}} >Ranking</Typography>
           <DataGrid
             rows={apostadores}
             columns={colApostadores}
@@ -78,7 +78,7 @@ export const Rank = () => {
             columnVisibilityModel={{id:false}}
             // sortModel={[{field:'fechaPartido'}]}
             localeText={esES.components.MuiDataGrid.defaultProps.localeText}
-            sx={{fontSize:18}}
+            sx={{fontSize:16}}
           />
         </Box>
         <Box component="div" sx={{alignItems:'center',width:{xs:'100vw',md:1000},mt:2}}>
