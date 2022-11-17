@@ -28,7 +28,7 @@
   "dir":"ltr",
   "id":"/v1",
   "lang":"es-ES",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "prefer_related_applications": false,
   "scope":"/"
 }

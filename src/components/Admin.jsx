@@ -257,8 +257,9 @@ export const Admin = () => {
               // minTime={'06:00:00'}
               inputFormat='DD/MM/YYYY HH:mm'
               disablePast
+              
               views={['year','month','day','hours']}
-              renderInput={(params) => <TextField {...params} />}
+              renderInput={(params) => <TextField sx={{width:'50%'}} {...params} />}
             />
           </LocalizationProvider>
         </Box>

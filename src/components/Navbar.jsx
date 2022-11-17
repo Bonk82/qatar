@@ -24,7 +24,7 @@ export const Navbar = () => {
   useEffect(() => {
     console.log('revisando',user);
     if(user.rol === 'administrador'){
-      const pagesAdmin = ['Fixture', 'Apuestas', 'Posiciones','Admin']
+      const pagesAdmin = ['Fixture', 'Apuestas', 'Ranking','Admin']
       setPages(pagesAdmin)
     }
   }, [user])
@@ -45,7 +45,7 @@ export const Navbar = () => {
     setAnchorElNav(null);
     if(destino === 'Fixture') navigate('/');
     if(destino === 'Apuestas') navigate('/bet');
-    if(destino === 'Posiciones') navigate('/ranking');
+    if(destino === 'Ranking') navigate('/ranking');
     if(destino === 'Admin') navigate('/admin');
   };
 

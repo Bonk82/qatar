@@ -123,9 +123,9 @@ const colApuestas = [
   return (
     <>
       <Navbar/>
-      <Box component='main' sx={{backgroundColor:'whitesmoke',height:'100vh',width:'100vw',display:'flex',flexDirection:{xs:'column',md:'row'},justifyContent:'center',gap:2}} >
+      <Box component='main' sx={{backgroundColor:'whitesmoke',height:'100vh',width:'100vw',display:'flex',flexDirection:{xs:'column',md:'row'},justifyContent:'center',gap:4}} >
         <Box sx={{ height: 700, width:{xs:'98vw',md:700},justifyContent:'center',mt:3,paddingX:1 }}>
-          <Typography variant="h5" sx={{fontWeight:500,backgroundColor:'secondary.main',color:'persist.main',borderRadius:2,pl:4}} >Apuestas disponibles</Typography>
+          <Typography variant="h5" sx={{fontWeight:500,backgroundColor:'secondary.main',color:'persist.main',borderRadius:2,pl:4,mb:1}} >Apuestas disponibles</Typography>
           <DataGrid
             rows={apuestas}
             columns={colApuestas}
@@ -144,7 +144,7 @@ const colApuestas = [
                 ,'& .gana3': { backgroundColor: '#52e36c',}
                 ,'& .gana5': { backgroundColor: '#18d93a',}
                 }}>
-          <Typography variant="h5" sx={{fontWeight:500,backgroundColor:'secondary.main',color:'primary.main',borderRadius:2,pl:4}} >Historial de tus Apuestas</Typography>
+          <Typography variant="h5" sx={{fontWeight:500,backgroundColor:'secondary.main',color:'primary.main',borderRadius:2,pl:4,mb:1}} >Historial de tus Apuestas</Typography>
           <DataGrid
             rows={partidos}
             columns={colPartidos}

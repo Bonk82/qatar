@@ -83,3 +83,33 @@ legend span{
     transform: rotate(360deg);
   }
 }
+/* 
+@media (min-width: 2001px) {
+  html {
+      font-size: 16px
+  }
+}
+
+@media (max-width: 2000px) {
+  html {
+      font-size: 14px
+  }
+}
+
+@media (max-width: 1650px) {
+  html {
+      font-size: 14px
+  }
+}
+
+@media (max-width: 1400px) {
+  html {
+      font-size: 13px
+  }
+} */
+
+@media (max-width: 1200px) {
+  html {
+      font-size: 12px
+  }
+}
