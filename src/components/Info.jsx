@@ -41,19 +41,19 @@ export const Info = () => {
         //                   .sort((a,b)=>new Date(a.fechaPartido).getTime() - new Date(b.fechaPartido).getTime());
         filas = alasql('select * from ? where finalizado = true order by fechaPartido',[resultados])
         columnas = [
-          {field:'fechaPartidoStr',headerName:'Fecha', minWidth:120},
-          {field:'equipoA',headerName:'Equipo', minWidth:110, flex:0.5, align:'center'
+          {field:'fechaPartidoStr',headerName:'Fecha', minWidth:100,flex:1},
+          {field:'equipoA',headerName:'Equipo', minWidth:90, flex:0.5, align:'center'
           , renderCell: (params) =><figure>
             <img title={`${params.row.equipoA}`} width='70' src={`../assets/${params.row.equipoA}.png`} alt='X'/>
             <figcaption>{`${params.row.equipoA}`}</figcaption>
           </figure>},
-          {field:'golesA',headerName:'Goles', width:70 ,type:'number'},
-          {field:'equipoB',headerName:'Equipo',minWidth:110, flex:0.5, align:'center'
+          {field:'golesA',headerName:'Goles', minWidth:50,flex:1 ,type:'number'},
+          {field:'equipoB',headerName:'Equipo',minWidth:90, flex:0.5, align:'center'
           , renderCell: (params) => <figure>
             <img title={`${params.row.equipoB}`} width='70' src={`../assets/${params.row.equipoB}.png`} alt='X'/>
             <figcaption>{`${params.row.equipoB}`}</figcaption>
           </figure>},
-          {field:'golesB',headerName:'Goles', width:70 ,type:'number'},
+          {field:'golesB',headerName:'Goles', minWidth:50,flex:1 ,type:'number'},
         ] ;
         orden=[{field:'fechaPartido'}];
       }
@@ -62,20 +62,20 @@ export const Info = () => {
         filas = alasql('select * from ? order by grupo,puntos desc,diferencia desc',[resultados])
         console.log(filas);
         columnas = [
-          {field:'grupo',headerName:'Grupo', width: 70},
-          {field:'nombre',headerName:'Equipo', minWidth:110, flex:1, align:'center'
+          {field:'grupo',headerName:'Grupo', minWidth:50,flex:1},
+          {field:'nombre',headerName:'Equipo', minWidth:90, flex:1, align:'center'
           , renderCell: (params) =><figure>
             <img title={`${params.row.nombre}`} width='70' src={`../assets/${params.row.nombre}.png`} alt='X'/>
             <figcaption>{`${params.row.nombre}`}</figcaption>
           </figure>},
-          {field:'jugados',headerName:'PJ', width: 70,type:'number'},
-          {field:'ganados',headerName:'PG', width: 70,type:'number'},
-          {field:'empatados',headerName:'PE', width: 70,type:'number'},
-          {field:'perdidos',headerName:'PP', width: 70,type:'number'},
-          {field:'favor',headerName:'GF', width: 70,type:'number'},
-          {field:'contra',headerName:'GC', width: 70,type:'number'},
-          {field:'diferencia',headerName:'GD', width: 70,type:'number'},
-          {field:'puntos',headerName:'PTS', width: 70,type:'number'},
+          {field:'jugados',headerName:'PJ',  minWidth:50,flex:1,type:'number'},
+          {field:'ganados',headerName:'PG',  minWidth:50,flex:1,type:'number'},
+          {field:'empatados',headerName:'PE',  minWidth:50,flex:1,type:'number'},
+          {field:'perdidos',headerName:'PP',  minWidth:50,flex:1,type:'number'},
+          {field:'favor',headerName:'GF',  minWidth:50,flex:1,type:'number'},
+          {field:'contra',headerName:'GC',  minWidth:50,flex:1,type:'number'},
+          {field:'diferencia',headerName:'GD',  minWidth:50,flex:1,type:'number'},
+          {field:'puntos',headerName:'PTS',  minWidth:50,flex:1,type:'number'},
         ] ;
         orden=[{field:'pts',sort:'desc'}];
       }

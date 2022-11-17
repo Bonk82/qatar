@@ -11,3 +11,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/*para apex charts*/
+.apexcharts-tooltip {
+  background: #444343;
+  color: #56042c;
+}

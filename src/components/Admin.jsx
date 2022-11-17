@@ -110,28 +110,28 @@ export const Admin = () => {
   }
 
   const colPartidos = [
-    {field: 'Acciones', headerName: 'Acciones', sortable: false, width:80,
+    {field: 'Acciones', headerName: 'Acciones', sortable: false, minWidth:50,flex:1,
       renderCell: (params) => {
         return <IconButton onClick={()=>onChangeScore(params.row)} title='Actualizar Score' color='success'><SaveAsIcon fontSize="large"/></IconButton>;
       },
     },
-    {field:'equipoA',headerName:'Equipo', minWidth:110, flex:0.5, align:'center'
+    {field:'equipoA',headerName:'Equipo', minWidth:90, flex:0.5, align:'center'
     , renderCell: (params) =><figure style={{textAlign:'center'}}>
       <img title={`${params.row.equipoA}`} width='70' src={`../assets/${params.row.equipoA}.png`} alt='X'/>
       <figcaption>{`${params.row.equipoA}`}</figcaption>
     </figure>},
-    {field:'golesA',headerName:'Goles', width: 70,editable:true,type:'number',min:0,max:9,align:'center', renderCell:(params)=>{
-      return <Typography variant="h3">{params.row.golesA}</Typography>
+    {field:'golesA',headerName:'Goles', minWidth:50,flex:1,editable:true,type:'number',min:0,max:9,align:'center', renderCell:(params)=>{
+      return <Typography variant="h4">{params.row.golesA}</Typography>
     }},
-    {field:'equipoB',headerName:'Equipo', minWidth:110, flex:0.5, align:'center'
+    {field:'equipoB',headerName:'Equipo', minWidth:90, flex:0.5, align:'center'
     , renderCell: (params) =><figure style={{textAlign:'center'}}>
       <img title={`${params.row.equipoB}`} width='70' src={`../assets/${params.row.equipoB}.png`} alt='X'/>
       <figcaption>{`${params.row.equipoB}`}</figcaption>
     </figure>},
-    {field:'golesB',headerName:'Goles', width: 70,editable:true,type:'number',min:0,max:9,align:'center', renderCell:(params)=>{
-      return <Typography variant="h3">{params.row.golesB}</Typography>
+    {field:'golesB',headerName:'Goles', minWidth:50,flex:1,editable:true,type:'number',min:0,max:9,align:'center', renderCell:(params)=>{
+      return <Typography variant="h4">{params.row.golesB}</Typography>
     }},
-    {field:'fechaPartidoStr',headerName:'Fecha Partido', width: 120,editable:false},
+    {field:'fechaPartidoStr',headerName:'Fecha Partido', minWidth:100,flex:1,editable:false},
     {field:'id',headerName:'ID'},
   ]
 
@@ -205,11 +205,11 @@ export const Admin = () => {
     <>
     <Navbar/>
     {isAdmin && 
-    <Box component='main' sx={{backgroundColor:'whitesmoke',height:'100vh',width:'100vw',display:'flex',flexDirection:{xs:'column',md:'row'},justifyContent:'center',gap:2}} >
-      <Box component="form" onSubmit={handleSubmit} noValidate sx={{alignItems:'center',width:{xs:'100vw',md:700},mt:2,paddingX:1}}>
+    <Box component='main' sx={{backgroundColor:'whitesmoke',minHeight:'100vh',width:'100vw',display:'flex',flexDirection:{xs:'column',md:'row'},justifyContent:'center',gap:2}} >
+      <Box component="form" onSubmit={handleSubmit} noValidate sx={{alignItems:'center',width:{xs:'100vw',md:700},mt:2,paddingX:0.5}}>
         <Typography variant="h5" color='primary' sx={{fontWeight:500,backgroundColor:'secondary.main',borderRadius:2,pl:4}}>Registro de Partidos</Typography>
         <FormGroup>
-          <FormControlLabel control={<Checkbox id="faseGrupos" defaultChecked />} label="Fase de grupos" />
+          <FormControlLabel sx={{pl:4}} control={<Checkbox id="faseGrupos" defaultChecked />} label="Fase de grupos" />
         </FormGroup>
         <InputLabel color="primary" >Equipo A</InputLabel>
         <Select
@@ -221,6 +221,7 @@ export const Admin = () => {
           value={partido.equipoA}
           label="Equipo A"
           displayEmpty
+          size="small"
           onChange={handleChange}
         >{
           equipos.map(e=>{
@@ -237,6 +238,7 @@ export const Admin = () => {
           value={partido.equipoB}
           label="Equipo B"
           input={<OutlinedInput />}
+          size="small"
           onChange={handleChange}
         >{
           equipos.map(e=>{
@@ -259,13 +261,13 @@ export const Admin = () => {
               disablePast
               
               views={['year','month','day','hours']}
-              renderInput={(params) => <TextField sx={{width:'50%'}} {...params} />}
+              renderInput={(params) => <TextField size="small" sx={{width:'50%'}} {...params} />}
             />
           </LocalizationProvider>
         </Box>
         <Button type="submit" fullWidth variant="contained" sx={{ mt: 3}}>Registrar</Button>
       </Box>
-      <Box sx={{ height: 450, width:{xs:'100vw',md:700},justifyContent:'center',mt:2,paddingX:1 }}>
+      <Box sx={{ height:{xs:350,md:700}, width:{xs:'100vw',md:700},justifyContent:'center',mt:2,paddingX:0.5}}>
         <Typography variant="h5" color='primary' sx={{fontWeight:500,backgroundColor:'secondary.main',borderRadius:2,pl:4,mb:1}}>Actualización de Resultados</Typography>
         <DataGrid
           rows={partidos}

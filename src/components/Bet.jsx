@@ -1,4 +1,4 @@
-import { Alert, Box, IconButton, Slide, Snackbar, TextField, Typography } from "@mui/material"
+import { Alert, Box, IconButton, Slide, Snackbar, Typography } from "@mui/material"
 import { DataGrid, esES } from "@mui/x-data-grid"
 import moment from "moment";
 import { useEffect, useState } from "react";
@@ -64,49 +64,49 @@ const listarPartidos = async()=>{
 }
 
 const colPartidos = [
-  {field:'puntos',headerName:'Puntos', width: 70,type:'number'},
-  {field:'equipoA',headerName:'Equipo', minWidth:110, flex:0.5, align:'center'
+  {field:'puntos',headerName:'Puntos', minWidth:50,flex:1,type:'number'},
+  {field:'equipoA',headerName:'Equipo', minWidth:90, flex:0.5, align:'center'
   , renderCell: (params) =><figure>
     <img title={`${params.row.equipoA}`} width='70' src={`../assets/${params.row.equipoA}.png`} alt='X'/>
     <figcaption>{`${params.row.equipoA}`}</figcaption>
   </figure>},
-  {field:'golesA',headerName:'Goles', width: 70,type:'number',min:0,max:9},
-  {field:'betA',headerName:'Apostado', width: 70,type:'number',min:0,max:9},
-  {field:'equipoB',headerName:'Equipo', minWidth:110, flex:0.5, align:'center'
+  {field:'golesA',headerName:'Goles', minWidth:50,flex:1,type:'number',min:0,max:9},
+  {field:'betA',headerName:'Apostado', minWidth:50,flex:1,type:'number',min:0,max:9},
+  {field:'equipoB',headerName:'Equipo', minWidth:90, flex:0.5, align:'center'
   , renderCell: (params) =><figure>
     <img title={`${params.row.equipoB}`} width='70' src={`../assets/${params.row.equipoB}.png`} alt='X'/>
     <figcaption>{`${params.row.equipoB}`}</figcaption>
   </figure>},
-  {field:'golesB',headerName:'Goles', width: 70,type:'number'},
-  {field:'betB',headerName:'Apostado', width: 70,type:'number'},
-  {field:'fechaPartidoStr',headerName:'Fecha Partido', width: 120},
+  {field:'golesB',headerName:'Goles',minWidth:50,flex:1,type:'number'},
+  {field:'betB',headerName:'Apostado', minWidth:50,flex:1,type:'number'},
+  {field:'fechaPartidoStr',headerName:'Fecha Partido', minWidth:100,flex:1},
   {field:'id',headerName:'ID'},
   {field:'apuestaID',headerName:'apuestaID'},
   {field:'activo',headerName:'Activo'},
 ]
 const colApuestas = [
-  {field: 'Apostar', headerName: 'Apostar', sortable: false, width:80,
+  {field: 'Apostar', headerName: 'Apostar', sortable: false, minWidth:50,flex:1,
     renderCell: (params) => {
       return <IconButton onClick={()=>onApuesta(params.row)} title='Apostar' color='success'><PaidIcon fontSize="large"/></IconButton>;
     },
   },
-  {field:'equipoA',headerName:'Equipo', minWidth:110, flex:0.5, align:'center'
+  {field:'equipoA',headerName:'Equipo', minWidth:90, flex:0.5, align:'center'
   , renderCell: (params) =><figure style={{textAlign:'center'}}>
     <img title={`${params.row.equipoA}`} width='70' src={`../assets/${params.row.equipoA}.png`} alt='X'/>
     <figcaption>{`${params.row.equipoA}`}</figcaption>
   </figure>},
-  {field:'betA',headerName:'Goles', width: 100,editable:true,type:'number',min:0,max:9,align:'center', renderCell:(params)=>{
-    return <Typography variant="h3">{params.row.betA}</Typography>
+  {field:'betA',headerName:'Goles', minWidth:50,flex:1,editable:true,type:'number',min:0,max:9,align:'center', renderCell:(params)=>{
+    return <Typography variant="h4">{params.row.betA}</Typography>
   }},
-  {field:'equipoB',headerName:'Equipo', minWidth:110, flex:0.5, align:'center'
+  {field:'equipoB',headerName:'Equipo', minWidth:90, flex:0.5, align:'center'
   , renderCell: (params) =><figure style={{textAlign:'center'}}>
     <img title={`${params.row.equipoB}`} width='70' src={`../assets/${params.row.equipoB}.png`} alt='X'/>
     <figcaption>{`${params.row.equipoB}`}</figcaption>
   </figure>},
-  {field:'betB',headerName:'Goles', width: 70,editable:true,type:'number', renderCell:(params)=>{
-    return <Typography variant="h3">{params.row.betB}</Typography>
+  {field:'betB',headerName:'Goles', minWidth:50,flex:1,editable:true,type:'number', renderCell:(params)=>{
+    return <Typography variant="h4">{params.row.betB}</Typography>
   }},
-  {field:'fechaPartidoStr',headerName:'Fecha Partido', width: 120,editable:false},
+  {field:'fechaPartidoStr',headerName:'Fecha Partido', minWidth:100,flex:1,editable:false},
   {field:'id',headerName:'ID'},
   {field:'apuestaID',headerName:'apuestaID'},
   {field:'activo',headerName:'Activo'},
@@ -123,8 +123,8 @@ const colApuestas = [
   return (
     <>
       <Navbar/>
-      <Box component='main' sx={{backgroundColor:'whitesmoke',height:'100vh',width:'100vw',display:'flex',flexDirection:{xs:'column',md:'row'},justifyContent:'center',gap:4}} >
-        <Box sx={{ height: 700, width:{xs:'98vw',md:700},justifyContent:'center',mt:3,paddingX:1 }}>
+      <Box component='main' sx={{backgroundColor:'whitesmoke',minHeight:'100vh',width:'100vw',display:'flex',flexDirection:{xs:'column',md:'row'},justifyContent:'center',gap:4}} >
+        <Box sx={{ height:{xs:400,md:700}, width:{xs:'100vw',md:700},justifyContent:'center',mt:3,paddingX:0.5 }}>
           <Typography variant="h5" sx={{fontWeight:500,backgroundColor:'secondary.main',color:'persist.main',borderRadius:2,pl:4,mb:1}} >Apuestas disponibles</Typography>
           <DataGrid
             rows={apuestas}
@@ -139,7 +139,7 @@ const colApuestas = [
             localeText={esES.components.MuiDataGrid.defaultProps.localeText}
           />
         </Box>
-        <Box sx={{ height: 700, width:{xs:'98vw',md:700},justifyContent:'center',mt:3, paddingX:1,
+        <Box sx={{ height:{xs:400,md:700}, width:{xs:'100vw',md:700},justifyContent:'center',mt:3, paddingX:0.5,
                 '& .gana1': {backgroundColor: '#a5f2b3',}
                 ,'& .gana3': { backgroundColor: '#52e36c',}
                 ,'& .gana5': { backgroundColor: '#18d93a',}

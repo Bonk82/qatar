@@ -32,7 +32,7 @@ export const Rank = () => {
     //console.log('apostadores',apostadoresAll,historialAll,apuestas,usuarios,partidos,rr);
     console.log('ver',apostadoresAll);
     setApostadores(apostadoresAll);
-    cargarDataChart()
+    cargarDataChart(apostadoresAll)
   }
 
   const cargarHistorial = async(row) =>{
@@ -52,10 +52,13 @@ export const Rank = () => {
     {field:'id',headerName:'ID', width: 80},
   ]
 
-  const cargarDataChart = ()=>{
+  const cargarDataChart = (data)=>{
+    console.log('la data',data);
     const users = [];
     const pts = [];
-    apostadores.forEach(d => {
+    
+    data.forEach(d => {
+      console.log('bets',d);
       users.push(d.nombre);
       pts.push(d.puntos);
     });
@@ -65,9 +68,9 @@ export const Rank = () => {
   return (
     <>
       <Navbar/>
-      <Box component='main' sx={{backgroundColor:'whitesmoke',height:'100vh',width:'100vw',display:'flex',flexDirection:{xs:'column',md:'row'},justifyContent:'center',gap:2}} >
-        <Box sx={{ height:{xs:400, md:550}, width:{xs:'100vw',md:350},justifyContent:'center',mt:2,paddingX:4 }}>
-          <Typography variant="h5" color='persist.main' sx={{fontWeight:500,backgroundColor:'secondary.main',borderRadius:2,pl:4}} >Ranking</Typography>
+      <Box component='main' sx={{backgroundColor:'whitesmoke',minHeight:'100vh',width:'100vw',display:'flex',flexDirection:{xs:'column',md:'row'},justifyContent:'center',gap:2}} >
+        <Box sx={{ height:{xs:400, md:550}, width:{xs:'100vw',md:350},justifyContent:'center',mt:1,paddingX:4 }}>
+          <Typography variant="h5" color='persist.main' sx={{fontWeight:500,backgroundColor:'secondary.main',borderRadius:2,pl:4,mb:1}} >Ranking</Typography>
           <DataGrid
             rows={apostadores}
             columns={colApostadores}
@@ -81,8 +84,8 @@ export const Rank = () => {
             sx={{fontSize:16}}
           />
         </Box>
-        <Box component="div" sx={{alignItems:'center',width:{xs:'100vw',md:1000},mt:2}}>
-          <Barras data={dataChart}></Barras>
+        <Box component="div" sx={{alignItems:'center',width:{xs:'100vw',md:1000},mt:1,pt:2}}>
+          {apostadores.length>0 && <Barras data={dataChart}></Barras>} 
         </Box>
     </Box>
     </>
