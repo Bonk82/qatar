@@ -9,10 +9,12 @@ import { useState } from "react"
 import { actualizar, guardar, listar } from "../connection/firebase";
 import { Navbar } from "./Navbar"
 import SaveAsIcon from '@mui/icons-material/SaveAs';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 let equiposAll = [];
+let apuestasAll = [];
 
 export const Admin = () => {
   const {user } = useAuth();
@@ -31,6 +33,7 @@ export const Admin = () => {
   useEffect(() => {
       cargarEquipos();
       listarPartidos();
+      listarApuestas();
   }, [])
 
   const onChangeScore = async (e)=>{
@@ -44,6 +47,7 @@ export const Admin = () => {
     } catch (error) {
       setAlerta([true,'danger','Marcador actualizado con éxito!'])
     } finally{
+      await listarPartidos();
       setAlerta([true,'success','Marcador actualizado con éxito!'])
     }
   }
@@ -82,7 +86,8 @@ export const Admin = () => {
   }
 
   const puntuarApuestas = async (data) =>{
-    const apuestas = await listar('apuesta');
+    const apuestas = apuestasAll.filter(f=>f.partidoID === data.id);
+    console.log('las apuestas',apuestas,apuestasAll);
     const factorA = equiposAll.filter(f=>f.nombre === data.equipoA)[0]?.factor;
     const factorB = equiposAll.filter(f=>f.nombre === data.equipoB)[0]?.factor;
     apuestas.map(e=>{
@@ -109,10 +114,16 @@ export const Admin = () => {
     });
   }
 
+  const listarApuestas = async () =>{
+    apuestasAll = await listar('apuesta');
+  }
+
   const colPartidos = [
     {field: 'Acciones', headerName: 'Acciones', sortable: false, minWidth:50,flex:1,
       renderCell: (params) => {
-        return <IconButton onClick={()=>onChangeScore(params.row)} title='Actualizar Score' color='success'><SaveAsIcon fontSize="large"/></IconButton>;
+        return <IconButton onClick={()=>onChangeScore(params.row)} title='Actualizar Score' color={params.row.finalizado? 'error':'success'}>
+                {params.row.finalizado? <CheckCircleIcon fontSize="large"/>:<SaveAsIcon fontSize="large"/>} 
+              </IconButton>;
       },
     },
     {field:'equipoA',headerName:'Equipo', minWidth:90, flex:0.5, align:'center'
@@ -123,17 +134,43 @@ export const Admin = () => {
     {field:'golesA',headerName:'Goles', minWidth:50,flex:1,editable:true,type:'number',min:0,max:9,align:'center', renderCell:(params)=>{
       return <Typography variant="h4">{params.row.golesA}</Typography>
     }},
+    {field:'golesB',headerName:'Goles', minWidth:50,flex:1,editable:true,type:'number',min:0,max:9,align:'center', renderCell:(params)=>{
+      return <Typography variant="h4">{params.row.golesB}</Typography>
+    }},
     {field:'equipoB',headerName:'Equipo', minWidth:90, flex:0.5, align:'center'
     , renderCell: (params) =><figure style={{textAlign:'center'}}>
       <img title={`${params.row.equipoB}`} width='70' src={`../assets/${params.row.equipoB}.png`} alt='X'/>
       <figcaption>{`${params.row.equipoB}`}</figcaption>
     </figure>},
-    {field:'golesB',headerName:'Goles', minWidth:50,flex:1,editable:true,type:'number',min:0,max:9,align:'center', renderCell:(params)=>{
-      return <Typography variant="h4">{params.row.golesB}</Typography>
-    }},
     {field:'fechaPartidoStr',headerName:'Fecha Partido', minWidth:100,flex:1,editable:false},
     {field:'id',headerName:'ID'},
   ]
+
+  const colEquipos = [
+    {field: 'Acciones', headerName: 'Acciones', sortable: false, minWidth:50,flex:1,
+      renderCell: (params) => {
+        return <IconButton onClick={()=>resetearEquipo(params.row)} title='Recetear' color='success'><SaveAsIcon fontSize="large"/></IconButton>;
+      },
+    },
+    {field:'nombre',headerName:'Equipo', minWidth:100, flex:1, align:'center'},
+    {field:'jugados',headerName:'Partidos', minWidth:50, flex:1, align:'center'},
+    {field:'id',headerName:'ID'},
+  ]
+
+  const resetearEquipo = async (data)=>{
+    console.log('equipo reset',data);
+    const newEquipo = {
+      jugados:0,
+      ganados:0,
+      empatados:0,
+      perdidos:0,
+      favor:0,
+      contra:0,
+      diferencia:0,
+      puntos:0,
+    }
+    await actualizar('equipo',data.id,newEquipo);
+  }
 
   const cargarEquipos = async () =>{
     let resp = await listar('equipo');
@@ -151,7 +188,7 @@ export const Admin = () => {
       return e
     })
     // let respi = resp.sort((a,b)=> new Date(a.fechaPartido).getTime() - new Date(b.fechaPartido).getTime());
-    resp = alasql('select * from ? order by fechaPartido',[resp])
+    resp = await alasql('select * from ? order by fechaPartido',[resp])
     console.log('partidos',resp);
     setPartidos(resp);
   }
@@ -282,6 +319,21 @@ export const Admin = () => {
           localeText={esES.components.MuiDataGrid.defaultProps.localeText}
         />
       </Box>
+      {/* <Box sx={{ height:{xs:350,md:700}, width:{xs:'100vw',md:700},justifyContent:'center',mt:2,paddingX:0.5}}>
+        <Typography variant="h5" color='primary' sx={{fontWeight:500,backgroundColor:'secondary.main',borderRadius:2,pl:4,mb:1}}>Recetear Equipos</Typography>
+        <DataGrid
+          rows={equipos}
+          columns={colEquipos}
+          pageSize={10}
+          rowsPerPageOptions={[10]}
+          disableSelectionOnClick
+          experimentalFeatures={{ newEditingApi: true }}
+          columnVisibilityModel={{id:false}}
+          rowHeight={80}
+          // sortModel={[{field:'fechaPartido'}]}
+          localeText={esES.components.MuiDataGrid.defaultProps.localeText}
+        />
+      </Box> */}
     </Box>
     }
     <Snackbar onClose={handleClose} open={alerta[0]} TransitionComponent={slideAlert} autoHideDuration={6000} anchorOrigin={{vertical:'top',horizontal:'right'}}>

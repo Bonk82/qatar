@@ -6,6 +6,7 @@ import { actualizar, guardar, listar } from "../connection/firebase";
 import { useAuth } from "../context/AuthContext";
 import { Navbar } from "./Navbar"
 import PaidIcon from '@mui/icons-material/Paid';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import alasql from "alasql";
 
 export const Bet = () => {
@@ -32,6 +33,7 @@ const onApuesta = async (e)=>{
     }else{
       await guardar('apuesta',nuevoObj);
       console.log('apuesta registrada',nuevoObj);
+      await listarPartidos();
       setAlerta([true,'success','Apuesta registrada, suerte!'])
     }
   } catch (error) {
@@ -42,6 +44,7 @@ const onApuesta = async (e)=>{
 const listarPartidos = async()=>{
   let part = await listar('partido');
   let bet = await listar('apuesta')
+  console.log('partidos',bet,user);
   bet = bet.filter(f=>f.uid===user.uid)
   part.map(e=>{
     e.fechaPartidoStr = moment(e.fechaPartido.toDate()).format('DD/MMM HH:mm');
@@ -57,28 +60,28 @@ const listarPartidos = async()=>{
   let pivotActivos = part.filter(f=>f.activo === 1);
 
   // let respi = resp.sort((a,b)=> new Date(a.fechaPartido).getTime() - new Date(b.fechaPartido).getTime());
-  pivotActivos = alasql('select * from ? order by fechaPartido',[pivotActivos])
+  pivotActivos = alasql('select * from ? order by [fechaPartido]',[pivotActivos])
   console.log('partidos y apuestas', pivotPasado,pivotActivos);
   setPartidos(pivotPasado);
   setApuestas(pivotActivos);
 }
 
 const colPartidos = [
-  {field:'puntos',headerName:'Puntos', minWidth:50,flex:1,type:'number'},
-  {field:'equipoA',headerName:'Equipo', minWidth:90, flex:0.5, align:'center'
+  {field:'puntos',headerName:'Puntos', minWidth:40,flex:1,type:'number'},
+  {field:'equipoA',headerName:'Equipo', minWidth:90, flex:1, align:'center'
   , renderCell: (params) =><figure>
-    <img title={`${params.row.equipoA}`} width='70' src={`../assets/${params.row.equipoA}.png`} alt='X'/>
-    <figcaption>{`${params.row.equipoA}`}</figcaption>
+    <img title={`${params.row.equipoA}`} style={{justifyContent:'center'}} width='70' src={`../assets/${params.row.equipoA}.png`} alt='X'/>
+    <figcaption style={{textAlign:'center'}}>{`${params.row.equipoA}`}</figcaption>
   </figure>},
-  {field:'golesA',headerName:'Goles', minWidth:50,flex:1,type:'number',min:0,max:9},
-  {field:'betA',headerName:'Apostado', minWidth:50,flex:1,type:'number',min:0,max:9},
-  {field:'equipoB',headerName:'Equipo', minWidth:90, flex:0.5, align:'center'
+  {field:'golesA',headerName:'Goles', minWidth:40,flex:1,type:'number',min:0,max:9},
+  {field:'betA',headerName:'Apostado', minWidth:0,flex:1,type:'number',min:0,max:9},
+  {field:'equipoB',headerName:'Equipo', minWidth:90, flex:1, align:'center'
   , renderCell: (params) =><figure>
-    <img title={`${params.row.equipoB}`} width='70' src={`../assets/${params.row.equipoB}.png`} alt='X'/>
-    <figcaption>{`${params.row.equipoB}`}</figcaption>
+    <img title={`${params.row.equipoB}`} style={{textAlign:'center'}} width='70' src={`../assets/${params.row.equipoB}.png`} alt='X'/>
+    <figcaption style={{textAlign:'center'}}>{`${params.row.equipoB}`}</figcaption>
   </figure>},
-  {field:'golesB',headerName:'Goles',minWidth:50,flex:1,type:'number'},
-  {field:'betB',headerName:'Apostado', minWidth:50,flex:1,type:'number'},
+  {field:'golesB',headerName:'Goles',minWidth:40,flex:1,type:'number'},
+  {field:'betB',headerName:'Apostado', minWidth:40,flex:1,type:'number'},
   {field:'fechaPartidoStr',headerName:'Fecha Partido', minWidth:100,flex:1},
   {field:'id',headerName:'ID'},
   {field:'apuestaID',headerName:'apuestaID'},
@@ -87,25 +90,27 @@ const colPartidos = [
 const colApuestas = [
   {field: 'Apostar', headerName: 'Apostar', sortable: false, minWidth:50,flex:1,
     renderCell: (params) => {
-      return <IconButton onClick={()=>onApuesta(params.row)} title='Apostar' color='success'><PaidIcon fontSize="large"/></IconButton>;
+      return <IconButton onClick={()=>onApuesta(params.row)} title='Apostar' color={params.row.apuestaID? 'error':'success'}>
+               {params.row.apuestaID? <CheckCircleIcon fontSize="large"/>:<PaidIcon fontSize="large"/>} 
+            </IconButton>;
     },
   },
-  {field:'equipoA',headerName:'Equipo', minWidth:90, flex:0.5, align:'center'
+  {field:'equipoA',headerName:'Equipo', minWidth:90, flex:1, align:'center'
   , renderCell: (params) =><figure style={{textAlign:'center'}}>
     <img title={`${params.row.equipoA}`} width='70' src={`../assets/${params.row.equipoA}.png`} alt='X'/>
     <figcaption>{`${params.row.equipoA}`}</figcaption>
   </figure>},
-  {field:'betA',headerName:'Goles', minWidth:50,flex:1,editable:true,type:'number',min:0,max:9,align:'center', renderCell:(params)=>{
+  {field:'betA',headerName:'Goles', minWidth:40,flex:1,editable:true,type:'number',min:0,max:9,align:'center', renderCell:(params)=>{
     return <Typography variant="h4">{params.row.betA}</Typography>
   }},
-  {field:'equipoB',headerName:'Equipo', minWidth:90, flex:0.5, align:'center'
+  {field:'betB',headerName:'Goles', minWidth:40,flex:1,editable:true,type:'number', renderCell:(params)=>{
+    return <Typography variant="h4">{params.row.betB}</Typography>
+  }},
+  {field:'equipoB',headerName:'Equipo', minWidth:90, flex:1, align:'center'
   , renderCell: (params) =><figure style={{textAlign:'center'}}>
     <img title={`${params.row.equipoB}`} width='70' src={`../assets/${params.row.equipoB}.png`} alt='X'/>
     <figcaption>{`${params.row.equipoB}`}</figcaption>
   </figure>},
-  {field:'betB',headerName:'Goles', minWidth:50,flex:1,editable:true,type:'number', renderCell:(params)=>{
-    return <Typography variant="h4">{params.row.betB}</Typography>
-  }},
   {field:'fechaPartidoStr',headerName:'Fecha Partido', minWidth:100,flex:1,editable:false},
   {field:'id',headerName:'ID'},
   {field:'apuestaID',headerName:'apuestaID'},
