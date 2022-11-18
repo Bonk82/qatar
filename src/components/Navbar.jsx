@@ -19,7 +19,7 @@ export const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const {user,logout} = useAuth();
-  const [pages, setPages] = useState(['Fixture', 'Apuestas', 'Posiciones'])
+  const [pages, setPages] = useState(['Fixture', 'Apuestas', 'Ranking'])
 
   useEffect(() => {
     console.log('revisando',user);
@@ -154,7 +154,7 @@ export const Navbar = () => {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            <Typography sx={{display:{xs:'none',md:'inline-flex'},marginRight:4,color:'antiquewhite'}}>bienvenido {user.displayName || user.email}</Typography>
+            <Typography sx={{display:{xs:'none',md:'inline-flex'},marginRight:4,color:'antiquewhite'}}>bienvenido {user.nombreUsuario || user.displayName || user.email}</Typography>
             <Tooltip title="Configuraciones">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="C" src={user.providerData[0]?.photoURL || user.reloadUserInfo?.photoUrl} />

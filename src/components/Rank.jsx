@@ -1,5 +1,5 @@
 
-import { Box, IconButton, Typography } from "@mui/material"
+import { Backdrop, Box, CircularProgress, IconButton, Typography } from "@mui/material"
 import { DataGrid, esES } from "@mui/x-data-grid"
 import alasql from "alasql"
 import { useEffect } from "react"
@@ -8,12 +8,15 @@ import { listar } from "../connection/firebase"
 import { Navbar } from "./Navbar"
 import MoneyIcon from '@mui/icons-material/Money';
 import { Barras } from "../charts/Barras"
+import { useAuth } from "../context/AuthContext"
 
 let historialAll = [];
 
 export const Rank = () => {
   const [apostadores, setApostadores] = useState([]);
   const [dataChart, setDataChart] = useState({x:[],y:[],titulos:{}})
+  const [openSpinner, setOpenSpinner] = useState(false);
+  const {user}=useAuth();
 
   useEffect(() => {
     cargarApostadores();
@@ -21,11 +24,13 @@ export const Rank = () => {
   }, [])
   
   const cargarApostadores = async()=>{
+    setOpenSpinner(true);
     const apuestas = await listar('apuesta');
     const usuarios = await listar('usuario');
     const partidos = await listar('partido');
-    historialAll = alasql(`select a.golesA betA,a.golesB betB, a.uid id,a.puntos,u.nombre,u.estado,p.equipoA,p.equipoB,p.fechaPartido.toDate() fechaPartido
-    ,p.golesA,p.golesB from ? u inner join ? a on u.userID =  a.uid inner join ? p on p.id = a.partidoID where u.estado = 'apuesta'`,[usuarios,apuestas,partidos]);
+    historialAll = alasql(`select a.golesA betA,a.golesB betB, a.uid id,a.puntos,u.nombre,u.estado,p.equipoA,p.equipoB
+    ,p.fechaPartido.toDate() fechaPartido,p.golesA,p.golesB from ? u inner join ? a on u.userID =  a.uid
+    inner join ? p on p.id = a.partidoID where u.estado = 'apuesta' and u.grupo = '${user.grupo}'`,[usuarios,apuestas,partidos]);
 
     const apostadoresAll = await alasql('SELECT nombre,id,SUM(puntos)puntos from ? GROUP BY nombre,id order by 3 desc',[historialAll]);
     // const rr = alasql('SELECT nombre,id,SUM(puntos)puntos from ? GROUP BY nombre,id',[historialAll]);
@@ -63,6 +68,7 @@ export const Rank = () => {
       pts.push(d.puntos);
     });
     setDataChart({x:users,y:pts,titulos:{x:'Participantes',y:'Puntos Obtenidos',c:'Ranking de Apostadores'}})
+    setOpenSpinner(false);
   }
 
   return (
@@ -88,6 +94,9 @@ export const Rank = () => {
           {apostadores.length>0 && <Barras data={dataChart}></Barras>} 
         </Box>
     </Box>
+    <Backdrop sx={{ color: 'primary.main', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={openSpinner}>
+      <CircularProgress color="inherit" size='7rem' thickness={5} />
+    </Backdrop>
     </>
   )
 }

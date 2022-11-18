@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { Alert } from '@mui/material';
 import { Google } from '@mui/icons-material';
 import { guardar, listar } from '../connection/firebase';
+import { useEffect } from 'react';
 
 function Copyright(props) {
   return (
@@ -33,11 +34,19 @@ function Copyright(props) {
 // const theme = createTheme();
 
 export const Login = () => {
-  const [user, setUser] = useState({email:'',password:''});
+  const [usuario, setUsuario] = useState({email:'',password:''});
   const [error, setError] = useState();
   const {login, loginWithGoogle, resetPassword}= useAuth();
   const navigate = useNavigate();
   // const logeado = useAuth();
+  const {user} = useAuth();
+
+  useEffect(() => {
+    console.log('revisando',user);
+    if(user?.rol) navigate('/');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
+  
 
   //mejor opcion para ir setenado los valores de cada control del form 
   // const handleChange = ({ target: { value, name } }) => setUser({ ...user, [name]: value });
@@ -48,8 +57,8 @@ export const Login = () => {
     const data = new FormData(event.currentTarget);
     const usuario = {email: data.get('email'),password: data.get('password')}
     console.log(usuario);
-    setUser(usuario)
-    console.log('el user',user);//dentro de la misma funcion no agarra el valor actulizado del setState
+    setUsuario(usuario)
+    console.log('el user',usuario);//dentro de la misma funcion no agarra el valor actulizado del setState
     // crearUsuario(data.get('email'),data.get('password'));
     try {
       const resp = await login(usuario.email,usuario.password);
@@ -81,9 +90,9 @@ export const Login = () => {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-    if (!user.email) return setError("Escribe un email valido");
+    if (!usuario.email) return setError("Escribe un email valido");
     try {
-      await resetPassword(user.email);
+      await resetPassword(usuario.email);
       setError('Ya te enviamos el correo, por favor revisa tus bandejas')
     } catch (error) {
       setError(error.message);
@@ -140,8 +149,8 @@ export const Login = () => {
             >
               Ingresar
             </Button>
-            <Button type='button' title='Iniciar con tu cuenta Google' fullWidth onClick={handleGoogleSignin} variant="outlined" sx={{ mt: 1, mb: 2 }}><Google/> oogle</Button>
-            <Grid container>
+            {/* <Button type='button' title='Iniciar con tu cuenta Google' fullWidth onClick={handleGoogleSignin} variant="outlined" sx={{ mt: 1, mb: 2 }}><Google/> oogle</Button> */}
+            <Grid container sx={{mt:2}}>
               <Grid item xs>
                 <Link onClick={handleResetPassword} variant="body2">
                   Olvidaste tu Contraseña

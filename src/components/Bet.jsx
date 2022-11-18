@@ -1,13 +1,17 @@
-import { Alert, Box, IconButton, Slide, Snackbar, Typography } from "@mui/material"
+import { Alert, Backdrop, Box, CircularProgress, IconButton, Slide, Snackbar, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material"
 import { DataGrid, esES } from "@mui/x-data-grid"
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { actualizar, guardar, listar } from "../connection/firebase";
 import { useAuth } from "../context/AuthContext";
 import { Navbar } from "./Navbar"
-import PaidIcon from '@mui/icons-material/Paid';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import alasql from "alasql";
+import SaveAsIcon from '@mui/icons-material/SaveAs';
+
+let apuestasAll = [];
+let partidosAll = [];
+let usuariosAll = [];
 
 export const Bet = () => {
 
@@ -16,6 +20,8 @@ export const Bet = () => {
   // const [apuesta, setApuesta] = useState({golesA:0,golesB:0,partidoID:'',uid:user.uid});
   const [apuestas, setApuestas] = useState([]);
   const [alerta, setAlerta] = useState([false,'success','']);
+  const [openSpinner, setOpenSpinner] = useState(false);
+  const [grilla, setGrilla] = useState({mostrar:false,filas:[],columnas:[],tipo:''});
 
   useEffect(() => {
     listarPartidos();
@@ -23,6 +29,7 @@ export const Bet = () => {
   }, []);
 
 const onApuesta = async (e)=>{
+  setOpenSpinner(true);
   console.log('bet',e);
   try {
     const nuevoObj  = {golesA:e.betA,golesB:e.betB,partidoID:e.id,uid:user.uid}
@@ -38,12 +45,16 @@ const onApuesta = async (e)=>{
     }
   } catch (error) {
     setAlerta([true,'danger','No se pudo registrar tu apuesta'])
+  } finally{
+    setOpenSpinner(false);
   }
 }
 
 const listarPartidos = async()=>{
-  let part = await listar('partido');
-  let bet = await listar('apuesta')
+  partidosAll = await listar('partido');
+  apuestasAll = await listar('apuesta');
+  let part = [...partidosAll];
+  let bet = [...apuestasAll];
   console.log('partidos',bet,user);
   bet = bet.filter(f=>f.uid===user.uid)
   part.map(e=>{
@@ -60,10 +71,11 @@ const listarPartidos = async()=>{
   let pivotActivos = part.filter(f=>f.activo === 1);
 
   // let respi = resp.sort((a,b)=> new Date(a.fechaPartido).getTime() - new Date(b.fechaPartido).getTime());
-  pivotActivos = alasql('select * from ? order by [fechaPartido]',[pivotActivos])
+  pivotActivos = await alasql('select * from ? order by [fechaPartido]',[pivotActivos])
   console.log('partidos y apuestas', pivotPasado,pivotActivos);
   setPartidos(pivotPasado);
   setApuestas(pivotActivos);
+  setGrilla({mostrar:true,filas:pivotActivos,columnas:colApuestas,tipo:'Apostar'})
 }
 
 const colPartidos = [
@@ -71,27 +83,23 @@ const colPartidos = [
   {field:'equipoA',headerName:'Equipo', minWidth:90, flex:1, align:'center'
   , renderCell: (params) =><figure>
     <img title={`${params.row.equipoA}`} style={{justifyContent:'center'}} width='70' src={`../assets/${params.row.equipoA}.png`} alt='X'/>
-    <figcaption style={{textAlign:'center'}}>{`${params.row.equipoA}`}</figcaption>
+    <figcaption style={{textAlign:'center'}}>{`${params.row.equipoA}`} : {`${params.row.golesA}`}</figcaption>
   </figure>},
-  {field:'golesA',headerName:'Goles', minWidth:40,flex:1,type:'number',min:0,max:9},
-  {field:'betA',headerName:'Apostado', minWidth:0,flex:1,type:'number',min:0,max:9},
+  {field:'betA',headerName:'Goles', minWidth:0,flex:1,type:'number'},
   {field:'equipoB',headerName:'Equipo', minWidth:90, flex:1, align:'center'
   , renderCell: (params) =><figure>
     <img title={`${params.row.equipoB}`} style={{textAlign:'center'}} width='70' src={`../assets/${params.row.equipoB}.png`} alt='X'/>
-    <figcaption style={{textAlign:'center'}}>{`${params.row.equipoB}`}</figcaption>
+    <figcaption style={{textAlign:'center'}}>{`${params.row.equipoB}`} : {`${params.row.golesB}`}</figcaption>
   </figure>},
-  {field:'golesB',headerName:'Goles',minWidth:40,flex:1,type:'number'},
-  {field:'betB',headerName:'Apostado', minWidth:40,flex:1,type:'number'},
-  {field:'fechaPartidoStr',headerName:'Fecha Partido', minWidth:100,flex:1},
-  {field:'id',headerName:'ID'},
-  {field:'apuestaID',headerName:'apuestaID'},
-  {field:'activo',headerName:'Activo'},
+  {field:'betB',headerName:'Goles', minWidth:40,flex:1,type:'number'},
+  {field:'fechaPartidoStr',headerName:'Fecha Partido', minWidth:100,flex:1}
 ]
+
 const colApuestas = [
   {field: 'Apostar', headerName: 'Apostar', sortable: false, minWidth:50,flex:1,
     renderCell: (params) => {
       return <IconButton onClick={()=>onApuesta(params.row)} title='Apostar' color={params.row.apuestaID? 'error':'success'}>
-               {params.row.apuestaID? <CheckCircleIcon fontSize="large"/>:<PaidIcon fontSize="large"/>} 
+               {params.row.apuestaID? <CheckCircleIcon fontSize="large"/>:<SaveAsIcon fontSize="large"/>} 
             </IconButton>;
     },
   },
@@ -125,51 +133,98 @@ const colApuestas = [
     return <Slide {...props} direction="up" />;
   }
 
+  const buttons = [
+    <ToggleButton  key="apuestasDisponibles" value='apuestasDisponibles' onClick={()=>cargarGrilla('Apostar')}>Apostar</ToggleButton>,
+    <ToggleButton  key="userApuestas" value='userApuestas' onClick={()=>cargarGrilla('Historial Personal')}>Historial Personal</ToggleButton>,
+    <ToggleButton  key="fechaApuestas" value='fechaApuestas' onClick={()=>cargarGrilla('Apuestas del Grupo')}>Apuestas del Grupo</ToggleButton>
+  ];
+
+  const cargarGrilla = async (tipo)=>{
+    console.log(tipo);
+    setOpenSpinner(true);
+    if(grilla.tipo === tipo){
+      setGrilla({mostrar:false,filas:[],columnas:[],tipo:'',orden:{}})
+      setOpenSpinner(false);
+    }else{
+      let columnas =[];
+      let filas =[];
+      if(tipo==='Apostar'){
+        filas = apuestas; 
+        columnas = colApuestas;
+      }
+      if(tipo==='Historial Personal'){
+        filas = partidos; 
+        columnas = colPartidos;
+      }
+      if(tipo==='Apuestas del Grupo'){
+        usuariosAll = await listar('usuario');
+        partidosAll = await listar('partido')
+        filas = await alasql(`select a.id, a.golesA betA, a.golesB betB, a.uid,p.equipoA,p.equipoB,p.fechaPartido,u.nombre
+        from ? a inner join ? p on a.partidoID = p.id inner join ? u on a.uid = u.userID
+        where u.grupo = '${user.grupo}' order by p.fechaPartido.toDate(), u.nombre`,[apuestasAll,partidosAll,usuariosAll]);
+
+        columnas = [
+          {field:'nombre',headerName:'Usuario', minWidth:120,flex:1},
+          {field:'equipoA',headerName:'Equipo', minWidth:90, flex:1, align:'center'
+          , renderCell: (params) =><figure style={{textAlign:'center'}}>
+            <img title={`${params.row.equipoA}`} width='70' src={`../assets/${params.row.equipoA}.png`} alt='X'/>
+            <figcaption>{`${params.row.equipoA}`}</figcaption>
+          </figure>},
+          {field:'betA',headerName:'Goles', minWidth:40,flex:1,editable:true,type:'number',min:0,max:9,align:'center', renderCell:(params)=>{
+            return <Typography variant="h4">{params.row.betA}</Typography>
+          }},
+          {field:'betB',headerName:'Goles', minWidth:40,flex:1,editable:true,type:'number', renderCell:(params)=>{
+            return <Typography variant="h4">{params.row.betB}</Typography>
+          }},
+          {field:'equipoB',headerName:'Equipo', minWidth:90, flex:1, align:'center'
+          , renderCell: (params) =><figure style={{textAlign:'center'}}>
+            <img title={`${params.row.equipoB}`} width='70' src={`../assets/${params.row.equipoB}.png`} alt='X'/>
+            <figcaption>{`${params.row.equipoB}`}</figcaption>
+          </figure>},
+          {field:'id',headerName:'ID'}
+        ]
+        console.log(filas,user.grupo,apuestasAll,partidosAll,usuariosAll);
+      }
+      setGrilla({mostrar:true,filas,columnas,tipo})
+      setOpenSpinner(false);
+    }
+  }
+
+
+
   return (
     <>
       <Navbar/>
-      <Box component='main' sx={{backgroundColor:'whitesmoke',minHeight:'100vh',width:'100vw',display:'flex',flexDirection:{xs:'column',md:'row'},justifyContent:'center',gap:4}} >
-        <Box sx={{ height:{xs:400,md:700}, width:{xs:'100vw',md:700},justifyContent:'center',mt:3,paddingX:0.5 }}>
-          <Typography variant="h5" sx={{fontWeight:500,backgroundColor:'secondary.main',color:'persist.main',borderRadius:2,pl:4,mb:1}} >Apuestas disponibles</Typography>
-          <DataGrid
-            rows={apuestas}
-            columns={colApuestas}
-            pageSize={10}
-            rowsPerPageOptions={[10]}
-            disableSelectionOnClick
-            rowHeight={80}
-            experimentalFeatures={{ newEditingApi: true }}
-            columnVisibilityModel={{id:false,apuestaID:false,activo:false}}
-            // sortModel={[{field:'fechaPartido'}]}
-            localeText={esES.components.MuiDataGrid.defaultProps.localeText}
-          />
+      <Box component='main' sx={{backgroundColor:'whitesmoke',width:'100vw'}} >
+        <Box sx={{display: 'flex',flexDirection: 'column',justifyContent:'center', alignItems: 'center','& > *': {m: 1, }}}>
+          <ToggleButtonGroup size="large" value={grilla.tipo} color="primary" sx={{fontWeight:'bold'}} aria-label="Platform" exclusive >
+            {buttons}
+          </ToggleButtonGroup>
         </Box>
-        <Box sx={{ height:{xs:400,md:700}, width:{xs:'100vw',md:700},justifyContent:'center',mt:3, paddingX:0.5,
-                '& .gana1': {backgroundColor: '#a5f2b3',}
-                ,'& .gana3': { backgroundColor: '#52e36c',}
-                ,'& .gana5': { backgroundColor: '#18d93a',}
-                }}>
-          <Typography variant="h5" sx={{fontWeight:500,backgroundColor:'secondary.main',color:'primary.main',borderRadius:2,pl:4,mb:1}} >Historial de tus Apuestas</Typography>
-          <DataGrid
-            rows={partidos}
-            columns={colPartidos}
-            pageSize={10}
-            rowsPerPageOptions={[10]}
-            disableSelectionOnClick
-            experimentalFeatures={{ newEditingApi: true }}
-            rowHeight={80}
-            columnVisibilityModel={{id:false,apuestaID:false,activo:false}}
-            localeText={esES.components.MuiDataGrid.defaultProps.localeText}
-            // sortModel={[{field:'fechaPartido'}]}
-            getCellClassName={(params) => {
-              return params.row.puntos >= 5 ? 'gana5' : params.row.puntos >= 3 ? 'gana3' : params.row.puntos >= 1 ? 'gana1':'nada';
-            }}
-          />
-        </Box>
+        {grilla.mostrar && 
+          <Box sx={{ height:{xs:600,md:800}, width:{xs:'100vw',md:800},display:'flex',justifyContent:'center',flexDirection:'column',paddingX:0.5 }}>
+            <Typography variant="h5" sx={{fontWeight:500,backgroundColor:'secondary.main',color:'persist.main',borderRadius:2,pl:4,mb:1}} >{grilla.tipo}</Typography>
+            <DataGrid
+              rows={grilla.filas}
+              columns={grilla.columnas}
+              pageSize={10}
+              rowsPerPageOptions={[10]}
+              disableSelectionOnClick
+              rowHeight={80}
+              experimentalFeatures={{ newEditingApi: true }}
+              columnVisibilityModel={{id:false,apuestaID:false,activo:false}}
+              sx={{fontSize:12}}
+              // sortModel={[{field:'fechaPartido'}]}
+              localeText={esES.components.MuiDataGrid.defaultProps.localeText}
+            />
+          </Box>}
       </Box>
       <Snackbar onClose={handleClose} open={alerta[0]} TransitionComponent={slideAlert} autoHideDuration={6000} anchorOrigin={{vertical:'top',horizontal:'right'}}>
         <Alert severity={alerta[1]} sx={{ width: '100%' }}> {alerta[2]}</Alert>
       </Snackbar>
+      <Backdrop sx={{ color: 'primary.main', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={openSpinner}>
+        <CircularProgress color="inherit" size='7rem' thickness={5} />
+      </Backdrop>
     </>
   )
 }

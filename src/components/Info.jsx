@@ -1,4 +1,4 @@
-import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material"
+import { Backdrop, Box, CircularProgress, ToggleButton, ToggleButtonGroup } from "@mui/material"
 import { DataGrid ,esES} from "@mui/x-data-grid";
 import alasql from "alasql";
 import moment from "moment";
@@ -21,11 +21,14 @@ export const Info = () => {
   const {tipoUsuario}= useAuth()
 
   const [grilla, setGrilla] = useState({mostrar:false,filas:[],columnas:[],tipo:'',orden:{}});
+  const [openSpinner, setOpenSpinner] = useState(false);
 
   const cargarGrilla = async (tipo)=>{
     console.log(tipo,tipoUsuario);
+    setOpenSpinner(true);
     if(grilla.tipo === tipo){
       setGrilla({mostrar:false,filas:[],columnas:[],tipo:'',orden:{}})
+      setOpenSpinner(false);
     }else{
       let columnas =[];
       let filas =[];
@@ -92,13 +95,14 @@ export const Info = () => {
         ] ;
       }
       setGrilla({mostrar:true,filas,columnas,tipo,orden})
+      setOpenSpinner(false);
     }
   }
 
   return (
     <>
     <Navbar/>
-      <Box component='main' sx={{textAlign:'center'}} >
+      <Box component='main' sx={{textAlign:'center',backgroundColor:"whitesmoke",width:'100vw'}} >
         <Box sx={{display: 'flex',flexDirection: 'column', alignItems: 'center','& > *': {m: 1, }}}>
           <ToggleButtonGroup size="large" value={grilla.tipo} color="primary" sx={{fontWeight:'bold'}} aria-label="Platform" exclusive >
             {buttons}
@@ -126,6 +130,9 @@ export const Info = () => {
           </Box>
         </Box>}
       </Box>
+      <Backdrop sx={{ color: 'primary.main', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={openSpinner}>
+        <CircularProgress color="inherit" size='7rem' thickness={5} />
+      </Backdrop>
     </>
   )
 }

@@ -11,9 +11,14 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Alert } from '@mui/material';
+import { Alert, FormControl } from '@mui/material';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+
 import { useState } from 'react';
 import { guardar } from '../connection/firebase';
+
 
 function Copyright(props) {
   return (
@@ -33,15 +38,21 @@ export const Register = () => {
   const [error, setError] = useState();
   const {signup}= useAuth();
   const navigate = useNavigate();
+  const [grupo, setGrupo] = useState('')
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError();
+    if(!grupo){
+      setError('Debe seleccionar algun grupo');
+      return true;
+    } 
     const data = new FormData(event.currentTarget);
     console.log({
       email: data.get('email'),
       password: data.get('password'),
       nombre:data.get('nombre'),
+      grupo:data.get('grupo')
     });
     setUser({email:data.get('email'),password:data.get('password')})
     console.log('el user',user);
@@ -49,7 +60,7 @@ export const Register = () => {
     try {
       const resp = await signup(data.get('email'),data.get('password'));
       console.log('signup',resp);
-      const newUser = {nombre:data.get('nombre'),tipo:'usuario',estado:'lectura',userID:resp.user?.uid,grupo:'UPRE'};
+      const newUser = {nombre:data.get('nombre'),tipo:'usuario',estado:'lectura',userID:resp.user?.uid,grupo};
       await guardar('usuario',newUser);
       navigate('/');
     } catch (error) {
@@ -59,6 +70,10 @@ export const Register = () => {
       if(error.code === 'auth/email-already-in-use') setError('El correo ya fue registrado!');
     }
   };
+
+  const handleChangeGrupo = (e)=>{
+    setGrupo(e.target.value);
+  }
 
   return (
       <Container component="main" maxWidth="xs">
@@ -79,6 +94,20 @@ export const Register = () => {
           {error && (<Alert severity="error">{error}</Alert>)} 
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
+              <FormControl fullWidth sx={{pl:2}}>
+                <InputLabel id="grupo" sx={{pl:2}}>Grupo</InputLabel>
+                <Select
+                  labelId="grupo"
+                  id="demo-simple-select"
+                  value={grupo}
+                  label="Age"
+                  onChange={handleChangeGrupo}
+                  autoFocus
+                >
+                  <MenuItem value={'UPRE'}>UPRE</MenuItem>
+                  <MenuItem value={'TUERCEBOTAS FUTBOL CLUB'}>TUERCEBOTAS FUTBOL CLUB</MenuItem>
+                </Select>
+              </FormControl>
               <Grid item xs={12}>
                 <TextField
                   name="nombre"
@@ -87,7 +116,6 @@ export const Register = () => {
                   id="nombre"
                   label="Nombre"
                   type="text"
-                  autoFocus
                 />
               </Grid>
               <Grid item xs={12}>

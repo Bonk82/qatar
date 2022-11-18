@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Checkbox, FormControlLabel, FormGroup, IconButton, InputLabel, MenuItem, OutlinedInput, Select, Slide, Snackbar, TextField, Typography } from "@mui/material"
+import { Alert, Backdrop, Box, Button, Checkbox, CircularProgress, FormControlLabel, FormGroup, IconButton, InputLabel, MenuItem, OutlinedInput, Select, Slide, Snackbar, TextField, Typography } from "@mui/material"
 import { DataGrid, esES } from "@mui/x-data-grid";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
@@ -24,6 +24,7 @@ export const Admin = () => {
   const [equipos, setEquipos] = useState([]);
   const [partido, setPartido] = useState({equipoA:'',golesA:0,equipoB:'',golesB:0,fechaPartido:moment().toDate().setMinutes(0),finalizado:false});
   const [alerta, setAlerta] = useState([false,'success','']);
+  const [openSpinner, setOpenSpinner] = useState(false);
 
   useEffect(() => {
     (user.rol !== 'administrador') ? navigate('/'): setIsAdmin(true);
@@ -37,6 +38,7 @@ export const Admin = () => {
   }, [])
 
   const onChangeScore = async (e)=>{
+    setOpenSpinner(true);
     console.log('score',e);
     try {
       const nuevoObj  = {golesA:e.golesA,golesB:e.golesB,finalizado:true}
@@ -45,10 +47,11 @@ export const Admin = () => {
       await puntuarApuestas(e);
       console.log('ya se actualizo');
     } catch (error) {
-      setAlerta([true,'danger','Marcador actualizado con éxito!'])
+      setAlerta([true,'danger','Error al actualizar marcador'])
     } finally{
       await listarPartidos();
       setAlerta([true,'success','Marcador actualizado con éxito!'])
+      setOpenSpinner(false);
     }
   }
 
@@ -115,7 +118,9 @@ export const Admin = () => {
   }
 
   const listarApuestas = async () =>{
+    setOpenSpinner(true);
     apuestasAll = await listar('apuesta');
+    setOpenSpinner(false);
   }
 
   const colPartidos = [
@@ -146,31 +151,31 @@ export const Admin = () => {
     {field:'id',headerName:'ID'},
   ]
 
-  const colEquipos = [
-    {field: 'Acciones', headerName: 'Acciones', sortable: false, minWidth:50,flex:1,
-      renderCell: (params) => {
-        return <IconButton onClick={()=>resetearEquipo(params.row)} title='Recetear' color='success'><SaveAsIcon fontSize="large"/></IconButton>;
-      },
-    },
-    {field:'nombre',headerName:'Equipo', minWidth:100, flex:1, align:'center'},
-    {field:'jugados',headerName:'Partidos', minWidth:50, flex:1, align:'center'},
-    {field:'id',headerName:'ID'},
-  ]
+  // const colEquipos = [
+  //   {field: 'Acciones', headerName: 'Acciones', sortable: false, minWidth:50,flex:1,
+  //     renderCell: (params) => {
+  //       return <IconButton onClick={()=>resetearEquipo(params.row)} title='Recetear' color='success'><SaveAsIcon fontSize="large"/></IconButton>;
+  //     },
+  //   },
+  //   {field:'nombre',headerName:'Equipo', minWidth:100, flex:1, align:'center'},
+  //   {field:'jugados',headerName:'Partidos', minWidth:50, flex:1, align:'center'},
+  //   {field:'id',headerName:'ID'},
+  // ]
 
-  const resetearEquipo = async (data)=>{
-    console.log('equipo reset',data);
-    const newEquipo = {
-      jugados:0,
-      ganados:0,
-      empatados:0,
-      perdidos:0,
-      favor:0,
-      contra:0,
-      diferencia:0,
-      puntos:0,
-    }
-    await actualizar('equipo',data.id,newEquipo);
-  }
+  // const resetearEquipo = async (data)=>{
+  //   console.log('equipo reset',data);
+  //   const newEquipo = {
+  //     jugados:0,
+  //     ganados:0,
+  //     empatados:0,
+  //     perdidos:0,
+  //     favor:0,
+  //     contra:0,
+  //     diferencia:0,
+  //     puntos:0,
+  //   }
+  //   await actualizar('equipo',data.id,newEquipo);
+  // }
 
   const cargarEquipos = async () =>{
     let resp = await listar('equipo');
@@ -199,6 +204,7 @@ export const Admin = () => {
       setAlerta([true,'warning','Debe llenar todos los campos']);
       return
     }
+    setOpenSpinner(true);
     const data = new FormData(e.currentTarget);
     const part = {nombre: data.get('equipoA'),factor: Number(data.get('golesA'))}
     console.log(partido,part);
@@ -211,8 +217,10 @@ export const Admin = () => {
       document.querySelector('#equipoA').focus();
       setEquipos(equiposAll);
       listarPartidos();
+      setOpenSpinner(false);
     } catch (error) {
       console.log(error.code,error.message);
+      setOpenSpinner(false);
     }
     console.log('registrado');
   }
@@ -339,6 +347,9 @@ export const Admin = () => {
     <Snackbar onClose={handleClose} open={alerta[0]} TransitionComponent={slideAlert} autoHideDuration={6000} anchorOrigin={{vertical:'top',horizontal:'right'}}>
       <Alert severity={alerta[1]} sx={{ width: '100%' }}> {alerta[2]}</Alert>
     </Snackbar>
+    <Backdrop sx={{ color: 'primary.main', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={openSpinner}>
+      <CircularProgress color="inherit" size='7rem' thickness={5} />
+    </Backdrop>
     </>
   )
 }

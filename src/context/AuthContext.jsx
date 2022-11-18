@@ -48,6 +48,7 @@ export function AuthProvider({ children }) {
       elUser.rol = usuario?.tipo;
       elUser.estado = usuario?.estado;
       elUser.grupo = usuario?.grupo;
+      elUser.nombreUsuario = usuario?.nombre
     }
     setUser(elUser);
     setLoading(false);
