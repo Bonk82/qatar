@@ -90,9 +90,10 @@ export const Login = () => {
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
-    if (!usuario.email) return setError("Escribe un email valido");
+    const data = document.getElementById('email').value;
+    if (!data) return setError("Escribe un email valido");
     try {
-      await resetPassword(usuario.email);
+      await resetPassword(data);
       setError('Ya te enviamos el correo, por favor revisa tus bandejas')
     } catch (error) {
       setError(error.message);
@@ -152,7 +153,7 @@ export const Login = () => {
             {/* <Button type='button' title='Iniciar con tu cuenta Google' fullWidth onClick={handleGoogleSignin} variant="outlined" sx={{ mt: 1, mb: 2 }}><Google/> oogle</Button> */}
             <Grid container sx={{mt:2}}>
               <Grid item xs>
-                <Link onClick={handleResetPassword} variant="body2">
+                <Link sx={{cursor:'pointer'}} onClick={handleResetPassword} variant="body2">
                   Olvidaste tu Contraseña
                 </Link>
               </Grid>
