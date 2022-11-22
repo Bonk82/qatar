@@ -57,6 +57,6 @@ export const Barras = ({data}) => {
 
 
   return (
-    <Chart options={chartBar.options} series={chartBar.series} type='bar' width='100%' />
+    <Chart options={chartBar.options} series={chartBar.series} type='bar' height='100%' width='100%' />
   )
 }

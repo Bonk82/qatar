@@ -20,20 +20,19 @@ export const Info = () => {
 
   const {tipoUsuario}= useAuth()
 
-  const [grilla, setGrilla] = useState({mostrar:false,filas:[],columnas:[],tipo:'',orden:{}});
+  const [grilla, setGrilla] = useState({mostrar:false,filas:[],columnas:[],tipo:''});
   const [openSpinner, setOpenSpinner] = useState(false);
 
   const cargarGrilla = async (tipo)=>{
     console.log(tipo,tipoUsuario);
     setOpenSpinner(true);
     if(grilla.tipo === tipo){
-      setGrilla({mostrar:false,filas:[],columnas:[],tipo:'',orden:{}})
+      setGrilla({mostrar:false,filas:[],columnas:[],tipo:''})
       setOpenSpinner(false);
     }else{
       let columnas =[];
       let filas =[];
       let resultados = [];
-      let orden={};
       if(tipo==='resultados'){
         resultados = await listar('partido');
         resultados.map(e=>{
@@ -58,7 +57,6 @@ export const Info = () => {
           </figure>},
           {field:'golesB',headerName:'Goles', minWidth:50,flex:1 ,type:'number'},
         ] ;
-        orden=[{field:'fechaPartido'}];
       }
       if(tipo==='posiciones'){
         resultados = await listar('equipo');
@@ -80,7 +78,6 @@ export const Info = () => {
           {field:'diferencia',headerName:'GD',  minWidth:50,flex:1,type:'number'},
           {field:'puntos',headerName:'PTS',  minWidth:50,flex:1,type:'number'},
         ] ;
-        orden=[{field:'pts',sort:'desc'}];
       }
       if(tipo==='dinamico'){
         resultados = await listar('equipo');
@@ -94,7 +91,7 @@ export const Info = () => {
           {field:'factor',headerName:'Factor', width: 100},
         ] ;
       }
-      setGrilla({mostrar:true,filas,columnas,tipo,orden})
+      setGrilla({mostrar:true,filas,columnas,tipo})
       setOpenSpinner(false);
     }
   }

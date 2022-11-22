@@ -29,8 +29,12 @@ export const Bet = () => {
   }, []);
 
 const onApuesta = async (e)=>{
-  setOpenSpinner(true);
   console.log('bet',e);
+  if(moment(e.fechaPartido.toDate()).add(-10,'minutes') <= moment()){
+    setAlerta([true,'error','Ya no se permiten apuestas para este Parido!']);
+    return true;
+  }
+  setOpenSpinner(true);
   try {
     const nuevoObj  = {golesA:e.betA,golesB:e.betB,partidoID:e.id,uid:user.uid}
     if(e.apuestaID){
@@ -71,7 +75,8 @@ const listarPartidos = async()=>{
   let pivotActivos = part.filter(f=>f.activo === 1);
 
   // let respi = resp.sort((a,b)=> new Date(a.fechaPartido).getTime() - new Date(b.fechaPartido).getTime());
-  pivotActivos = await alasql('select * from ? order by [fechaPartido]',[pivotActivos])
+  pivotActivos = await alasql('select * from ? order by [fechaPartido]',[pivotActivos]);
+  pivotPasado = await alasql('select * from ? order by [fechaPartido] desc',[pivotPasado]);
   console.log('partidos y apuestas', pivotPasado,pivotActivos);
   setPartidos(pivotPasado);
   setApuestas(pivotActivos);
@@ -81,17 +86,17 @@ const listarPartidos = async()=>{
 const colPartidos = [
   {field:'puntos',headerName:'Puntos', minWidth:40,flex:1,type:'number'},
   {field:'equipoA',headerName:'Equipo', minWidth:90, flex:1, align:'center'
-  , renderCell: (params) =><figure>
-    <img title={`${params.row.equipoA}`} style={{justifyContent:'center'}} width='70' src={`../assets/${params.row.equipoA}.png`} alt='X'/>
-    <figcaption style={{textAlign:'center'}}>{`${params.row.equipoA}`} : {`${params.row.golesA}`}</figcaption>
+  , renderCell: (params) =><figure style={{textAlign:'center'}}>
+    <img title={`${params.row.equipoA}`} width='70' src={`../assets/${params.row.equipoA}.png`} alt='X'/>
+    <figcaption >{`${params.row.equipoA}`} : {`${params.row.golesA}`}</figcaption>
   </figure>},
-  {field:'betA',headerName:'Goles', minWidth:0,flex:1,type:'number'},
+  {field:'betA',headerName:'Goles',editable:false, minWidth:40,flex:1},
+  {field:'betB',headerName:'Goles',editable:false, minWidth:40,flex:1},
   {field:'equipoB',headerName:'Equipo', minWidth:90, flex:1, align:'center'
-  , renderCell: (params) =><figure>
-    <img title={`${params.row.equipoB}`} style={{textAlign:'center'}} width='70' src={`../assets/${params.row.equipoB}.png`} alt='X'/>
-    <figcaption style={{textAlign:'center'}}>{`${params.row.equipoB}`} : {`${params.row.golesB}`}</figcaption>
+  , renderCell: (params) =><figure style={{textAlign:'center'}}>
+    <img title={`${params.row.equipoB}`} width='70' src={`../assets/${params.row.equipoB}.png`} alt='X'/>
+    <figcaption >{`${params.row.equipoB}`} : {`${params.row.golesB}`}</figcaption>
   </figure>},
-  {field:'betB',headerName:'Goles', minWidth:40,flex:1,type:'number'},
   {field:'fechaPartidoStr',headerName:'Fecha Partido', minWidth:100,flex:1}
 ]
 
@@ -134,9 +139,9 @@ const colApuestas = [
   }
 
   const buttons = [
-    <ToggleButton  key="apuestasDisponibles" value='apuestasDisponibles' onClick={()=>cargarGrilla('Apostar')}>Apostar</ToggleButton>,
-    <ToggleButton  key="userApuestas" value='userApuestas' onClick={()=>cargarGrilla('Historial Personal')}>Historial Personal</ToggleButton>,
-    <ToggleButton  key="fechaApuestas" value='fechaApuestas' onClick={()=>cargarGrilla('Apuestas del Grupo')}>Apuestas del Grupo</ToggleButton>
+    <ToggleButton  key="apuestasDisponibles" value='Apostar' onClick={()=>cargarGrilla('Apostar')}>Apostar</ToggleButton>,
+    <ToggleButton  key="userApuestas" value='Historial Personal' onClick={()=>cargarGrilla('Historial Personal')}>Historial Personal</ToggleButton>,
+    <ToggleButton  key="fechaApuestas" value='Apuestas del Grupo' onClick={()=>cargarGrilla('Apuestas del Grupo')}>Apuestas del Grupo</ToggleButton>
   ];
 
   const cargarGrilla = async (tipo)=>{
@@ -163,6 +168,9 @@ const colApuestas = [
         from ? a inner join ? p on a.partidoID = p.id inner join ? u on a.uid = u.userID
         where u.grupo = '${user.grupo}' order by p.fechaPartido.toDate(), u.nombre`,[apuestasAll,partidosAll,usuariosAll]);
 
+        filas = await filas.filter(f=>moment(f.fechaPartido.toDate()) < moment());
+        filas = await filas.sort((a,b)=>b.fechaPartido.toDate() - a.fechaPartido.toDate())
+
         columnas = [
           {field:'nombre',headerName:'Usuario', minWidth:120,flex:1},
           {field:'equipoA',headerName:'Equipo', minWidth:90, flex:1, align:'center'
@@ -170,10 +178,10 @@ const colApuestas = [
             <img title={`${params.row.equipoA}`} width='70' src={`../assets/${params.row.equipoA}.png`} alt='X'/>
             <figcaption>{`${params.row.equipoA}`}</figcaption>
           </figure>},
-          {field:'betA',headerName:'Goles', minWidth:40,flex:1,editable:true,type:'number',min:0,max:9,align:'center', renderCell:(params)=>{
+          {field:'betA',headerName:'Goles',editable:false, minWidth:40,flex:1,align:'center', renderCell:(params)=>{
             return <Typography variant="h4">{params.row.betA}</Typography>
           }},
-          {field:'betB',headerName:'Goles', minWidth:40,flex:1,editable:true,type:'number', renderCell:(params)=>{
+          {field:'betB',headerName:'Goles',editable:false, minWidth:40,flex:1, renderCell:(params)=>{
             return <Typography variant="h4">{params.row.betB}</Typography>
           }},
           {field:'equipoB',headerName:'Equipo', minWidth:90, flex:1, align:'center'
@@ -202,7 +210,7 @@ const colApuestas = [
           </ToggleButtonGroup>
         </Box>
         {grilla.mostrar && 
-          <Box sx={{ height:{xs:600,md:800}, width:{xs:'100vw',md:800},display:'flex',justifyContent:'center',flexDirection:'column',paddingX:0.5 }}>
+          <Box sx={{ height:{xs:600,md:800}, display:'flex',justifyContent:'center',flexDirection:'column',paddingX:{xs:0.5,md:40} }}>
             <Typography variant="h5" sx={{fontWeight:500,backgroundColor:'secondary.main',color:'persist.main',borderRadius:2,pl:4,mb:1}} >{grilla.tipo}</Typography>
             <DataGrid
               rows={grilla.filas}

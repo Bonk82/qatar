@@ -42,7 +42,7 @@ export const Rank = () => {
 
   const cargarHistorial = async(row) =>{
     console.log(row);
-    const historialUsuario = historialAll.filter(f=>f.uid === row.id)
+    const historialUsuario = historialAll.filter(f=>f.id === row.id)
     console.log(historialUsuario,apostadores);
   }
 
@@ -75,7 +75,7 @@ export const Rank = () => {
     <>
       <Navbar/>
       <Box component='main' sx={{backgroundColor:'whitesmoke',minHeight:'100vh',width:'100vw',display:'flex',flexDirection:{xs:'column',md:'row'},justifyContent:'center',gap:2}} >
-        <Box sx={{ height:{xs:400, md:550}, width:{xs:'100vw',md:400},justifyContent:'center',mt:1,paddingX:4 }}>
+        <Box sx={{ height:{xs:400, md:550}, width:{xs:'100vw',md:400},justifyContent:'center',mt:1,paddingX:{xs:0.5,md:4} }}>
           <Typography variant="h5" color='persist.main' sx={{fontWeight:500,backgroundColor:'secondary.main',borderRadius:2,pl:4,mb:1}} >Ranking</Typography>
           <DataGrid
             rows={apostadores}
@@ -90,7 +90,7 @@ export const Rank = () => {
             sx={{fontSize:16}}
           />
         </Box>
-        <Box component="div" sx={{alignItems:'center',width:{xs:'100vw',md:900},mt:1,pt:2}}>
+        <Box component="div" sx={{alignItems:'center',width:{xs:'100vw',md:900},height:{xs:450,md:800},mt:1,pt:2}}>
           {apostadores.length>0 && <Barras data={dataChart}></Barras>} 
         </Box>
     </Box>
