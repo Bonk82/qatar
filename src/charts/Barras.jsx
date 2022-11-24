@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import Chart from "react-apexcharts";
 
 export const Barras = ({data}) => {
-  console.log(data);
+  // console.log(data);
   useEffect(() => {
     recargarData();
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -11,7 +11,7 @@ export const Barras = ({data}) => {
   const [chartBar, setChartBar] = useState({options:{},series:[]});
 
   const recargarData=()=>{
-    console.log('recargando');
+    // console.log('recargando');
     const options = {
       chart: {
         id: "basic-bar"
@@ -29,6 +29,7 @@ export const Barras = ({data}) => {
         }
       },
       yaxis:{
+        decimalsInFloat: 2,
         title:{
           text:data.titulos?.y
         }

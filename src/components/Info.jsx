@@ -4,7 +4,7 @@ import alasql from "alasql";
 import moment from "moment";
 import { useState } from "react";
 import { listar } from "../connection/firebase";
-import { useAuth } from "../context/AuthContext";
+// import { useAuth } from "../context/AuthContext";
 import { Navbar } from "./Navbar"
 
 // const [dtsResultados, setDtsResultados] = useState([]);
@@ -18,13 +18,13 @@ export const Info = () => {
     <ToggleButton  key="dinamico" value='dinamico' onClick={()=>cargarGrilla('dinamico')}>Dinámico</ToggleButton>
   ];
 
-  const {tipoUsuario}= useAuth()
+  // const {tipoUsuario}= useAuth()
 
   const [grilla, setGrilla] = useState({mostrar:false,filas:[],columnas:[],tipo:''});
   const [openSpinner, setOpenSpinner] = useState(false);
 
   const cargarGrilla = async (tipo)=>{
-    console.log(tipo,tipoUsuario);
+    // console.log(tipo,tipoUsuario);
     setOpenSpinner(true);
     if(grilla.tipo === tipo){
       setGrilla({mostrar:false,filas:[],columnas:[],tipo:''})
@@ -61,7 +61,7 @@ export const Info = () => {
       if(tipo==='posiciones'){
         resultados = await listar('equipo');
         filas = alasql('select * from ? order by grupo,puntos desc,diferencia desc',[resultados])
-        console.log(filas);
+        // console.log(filas);
         columnas = [
           {field:'grupo',headerName:'Grupo', minWidth:50,flex:1},
           {field:'nombre',headerName:'Equipo', minWidth:90, flex:1, align:'center'

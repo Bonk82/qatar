@@ -39,13 +39,13 @@ export const Admin = () => {
 
   const onChangeScore = async (e)=>{
     setOpenSpinner(true);
-    console.log('score',e);
+    // console.log('score',e);
     try {
-      const nuevoObj  = {golesA:e.golesA,golesB:e.golesB,finalizado:true}
+      const nuevoObj  = {golesA:Number(e.golesA),golesB:Number(e.golesB),finalizado:true}
       await actualizar('partido',e.id,nuevoObj);
       await actualizarPuntuacion(e);
       await puntuarApuestas(e);
-      console.log('ya se actualizo');
+      // console.log('ya se actualizo');
     } catch (error) {
       setAlerta([true,'danger','Error al actualizar marcador'])
     } finally{
@@ -56,7 +56,7 @@ export const Admin = () => {
   }
 
   const actualizarPuntuacion = async (data) =>{
-    console.log(data);
+    // console.log(data);
     let ptsA=0;
     if(data.golesA > data.golesB) ptsA=3;
     if(data.golesA === data.golesB) ptsA=1;
@@ -90,7 +90,7 @@ export const Admin = () => {
 
   const puntuarApuestas = async (data) =>{
     const apuestas = apuestasAll.filter(f=>f.partidoID === data.id);
-    console.log('las apuestas',apuestas,apuestasAll);
+    // console.log('las apuestas',apuestas,apuestasAll);
     const factorA = equiposAll.filter(f=>f.nombre === data.equipoA)[0]?.factor;
     const factorB = equiposAll.filter(f=>f.nombre === data.equipoB)[0]?.factor;
     apuestas.map(e=>{
@@ -103,14 +103,14 @@ export const Admin = () => {
       if(data.golesA === data.golesB && e.golesA === e.golesB) puntaje += 2
       //TODO: agregar la valoracion del factor de equipo y el tiempo antes del partido
       e.puntos = puntaje;
-      console.log('laApuesta',e);
+      // console.log('laApuesta',e);
       return e;
     });
 
     apuestas.forEach(async (e) => {
       try {
         await actualizar('apuesta',e.id,{puntos:e.puntos})
-        console.log('apuesta actualizada',e.id);
+        // console.log('apuesta actualizada',e.id);
       } catch (error) {
         console.log(error);
       }
@@ -181,7 +181,7 @@ export const Admin = () => {
     let resp = await listar('equipo');
     // let respi = resp.sort((a,b)=> a.nombre - b.nombre);
     let respi = alasql('select * from ? order by nombre',[resp])
-    console.log('equipos',respi);
+    // console.log('equipos',respi);
     equiposAll = respi;
     setEquipos(respi);
   }
@@ -194,7 +194,7 @@ export const Admin = () => {
     })
     // let respi = resp.sort((a,b)=> new Date(a.fechaPartido).getTime() - new Date(b.fechaPartido).getTime());
     resp = await alasql('select * from ? order by fechaPartido',[resp])
-    console.log('partidos',resp);
+    // console.log('partidos',resp);
     setPartidos(resp);
   }
 
@@ -207,11 +207,11 @@ export const Admin = () => {
     setOpenSpinner(true);
     const data = new FormData(e.currentTarget);
     const part = {nombre: data.get('equipoA'),factor: Number(data.get('golesA'))}
-    console.log(partido,part);
+    // console.log(partido,part);
     try {
       const nuevoPartido = await guardar('partido',partido);
       setAlerta([true,'success','Partido registrado con éxito!']);
-      console.log(nuevoPartido);
+      // console.log(nuevoPartido);
       document.querySelector('#equipoA').value = '';
       document.querySelector('#equipoB').value = '';
       document.querySelector('#equipoA').focus();
@@ -222,12 +222,12 @@ export const Admin = () => {
       console.log(error.code,error.message);
       setOpenSpinner(false);
     }
-    console.log('registrado');
+    // console.log('registrado');
   }
 
   const handleChange = ({target:{value,name}})=>{
     setPartido({...partido,[name]:value})
-    console.log(document.querySelector('#faseGrupos').value);
+    // console.log(document.querySelector('#faseGrupos').value);
     const grupo = equipos.filter(f=>f.nombre === value)[0]?.grupo;
     const pivot = equipos.filter(f=>f.grupo === grupo);
     setEquipos(pivot); 

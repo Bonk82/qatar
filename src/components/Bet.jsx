@@ -29,21 +29,21 @@ export const Bet = () => {
   }, []);
 
 const onApuesta = async (e)=>{
-  console.log('bet',e);
+  // console.log('bet',e);
   if(moment(e.fechaPartido.toDate()).add(-10,'minutes') <= moment()){
     setAlerta([true,'error','Ya no se permiten apuestas para este Parido!']);
     return true;
   }
   setOpenSpinner(true);
   try {
-    const nuevoObj  = {golesA:e.betA,golesB:e.betB,partidoID:e.id,uid:user.uid}
+    const nuevoObj  = {golesA:Number(e.betA),golesB:Number(e.betB),partidoID:e.id,uid:user.uid}
     if(e.apuestaID){
       await actualizar('apuesta',e.apuestaID,nuevoObj);
-      console.log('apuesta actualizada',nuevoObj);
+      // console.log('apuesta actualizada',nuevoObj);
       setAlerta([true,'success','Apuesta actualizada, suerte!'])
     }else{
       await guardar('apuesta',nuevoObj);
-      console.log('apuesta registrada',nuevoObj);
+      // console.log('apuesta registrada',nuevoObj);
       await listarPartidos();
       setAlerta([true,'success','Apuesta registrada, suerte!'])
     }
@@ -59,7 +59,7 @@ const listarPartidos = async()=>{
   apuestasAll = await listar('apuesta');
   let part = [...partidosAll];
   let bet = [...apuestasAll];
-  console.log('partidos',bet,user);
+  // console.log('partidos',bet,user);
   bet = bet.filter(f=>f.uid===user.uid)
   part.map(e=>{
     e.fechaPartidoStr = moment(e.fechaPartido.toDate()).format('DD/MMM HH:mm');
@@ -77,7 +77,7 @@ const listarPartidos = async()=>{
   // let respi = resp.sort((a,b)=> new Date(a.fechaPartido).getTime() - new Date(b.fechaPartido).getTime());
   pivotActivos = await alasql('select * from ? order by [fechaPartido]',[pivotActivos]);
   pivotPasado = await alasql('select * from ? order by [fechaPartido] desc',[pivotPasado]);
-  console.log('partidos y apuestas', pivotPasado,pivotActivos);
+  // console.log('partidos y apuestas', pivotPasado,pivotActivos);
   setPartidos(pivotPasado);
   setApuestas(pivotActivos);
   setGrilla({mostrar:true,filas:pivotActivos,columnas:colApuestas,tipo:'Apostar'})
@@ -145,7 +145,7 @@ const colApuestas = [
   ];
 
   const cargarGrilla = async (tipo)=>{
-    console.log(tipo);
+    // console.log(tipo);
     setOpenSpinner(true);
     if(grilla.tipo === tipo){
       setGrilla({mostrar:false,filas:[],columnas:[],tipo:'',orden:{}})
@@ -191,7 +191,7 @@ const colApuestas = [
           </figure>},
           {field:'id',headerName:'ID'}
         ]
-        console.log(filas,user.grupo,apuestasAll,partidosAll,usuariosAll);
+        // console.log(filas,user.grupo,apuestasAll,partidosAll,usuariosAll);
       }
       setGrilla({mostrar:true,filas,columnas,tipo})
       setOpenSpinner(false);

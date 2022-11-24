@@ -1,5 +1,5 @@
 
-import { Backdrop, Box, CircularProgress, IconButton, Typography } from "@mui/material"
+import { Backdrop, Box, Button, CircularProgress, IconButton, Typography } from "@mui/material"
 import { DataGrid, esES } from "@mui/x-data-grid"
 import alasql from "alasql"
 import { useEffect } from "react"
@@ -9,14 +9,19 @@ import { Navbar } from "./Navbar"
 import MoneyIcon from '@mui/icons-material/Money';
 import { Barras } from "../charts/Barras"
 import { useAuth } from "../context/AuthContext"
+import { Linea } from "../charts/Linea"
+import moment from "moment"
+import BarChartIcon from '@mui/icons-material/BarChart';
 
 let historialAll = [];
 
 export const Rank = () => {
   const [apostadores, setApostadores] = useState([]);
-  const [dataChart, setDataChart] = useState({x:[],y:[],titulos:{}})
+  const [dataChart, setDataChart] = useState({x:[],y:[],titulos:{},naame:''})
+  const [dataChartLine, setDataChartLine] = useState({x:[],y:[],titulos:{},naame:''})
   const [openSpinner, setOpenSpinner] = useState(false);
   const {user}=useAuth();
+  const [historial, setHistorial] = useState(false);
 
   useEffect(() => {
     cargarApostadores();
@@ -35,15 +40,29 @@ export const Rank = () => {
     const apostadoresAll = await alasql('SELECT nombre,id,SUM(puntos)puntos from ? GROUP BY nombre,id order by 3 desc',[historialAll]);
     // const rr = alasql('SELECT nombre,id,SUM(puntos)puntos from ? GROUP BY nombre,id',[historialAll]);
     //console.log('apostadores',apostadoresAll,historialAll,apuestas,usuarios,partidos,rr);
-    console.log('ver',apostadoresAll);
+    // console.log('ver',apostadoresAll);
     setApostadores(apostadoresAll);
     cargarDataChart(apostadoresAll)
   }
 
   const cargarHistorial = async(row) =>{
-    console.log(row);
-    const historialUsuario = historialAll.filter(f=>f.id === row.id)
-    console.log(historialUsuario,apostadores);
+    setOpenSpinner(true);
+    // console.log(row);
+    // const misApuestas = historialAll.filter(f=>f.id === row.id)
+    const historialUsuario = await alasql(`select CONVERT(STRING,DATE(fechaPartido),112) fechaPartido,sum(puntos) puntos from ? where id='${row.id}' group by CONVERT(STRING,DATE(fechaPartido),112) order by [fechaPartido]`,[historialAll]) //historialAll.filter(f=>f.id === row.id)
+    // console.log('flag',historialUsuario,apostadores,misApuestas);
+    let pts =[];
+    let fechas = [];
+    let puntosDia =0;
+    // historialUsuario = await historialUsuario.sort((a,b)=> a.fechaPartido.toDate() - b.fechaPArtido.toDate())
+    historialUsuario.forEach(a => {
+      if(puntosDia===0) puntosDia = a.puntos
+      pts.push(a.puntos || 0);
+      fechas.push(moment(a.fechaPartido).format('DD/MMM'));
+    });
+    setDataChartLine({x:fechas,y:pts,titulos:{x:'Fechas',y:'Puntos Obtenidos',c:'Historial Personal - '+ row.nombre},name:row.nombre})
+    setHistorial(true);
+    setOpenSpinner(false);
   }
 
   const colApostadores = [
@@ -58,18 +77,24 @@ export const Rank = () => {
   ]
 
   const cargarDataChart = (data)=>{
-    console.log('la data',data);
+    // console.log('la data',data);
     const users = [];
     const pts = [];
     
     data.forEach(d => {
-      console.log('bets',d);
+      // console.log('bets',d);
       users.push(d.nombre);
-      pts.push(d.puntos);
+      pts.push(Number(d.puntos.toFixed(2)));
     });
-    setDataChart({x:users,y:pts,titulos:{x:'Participantes',y:'Puntos Obtenidos',c:'Ranking de Apostadores'}})
+    setDataChart({x:users,y:pts,titulos:{x:'Participantes',y:'Puntos Obtenidos',c:'Ranking de Apostadores'},name:''})
     setOpenSpinner(false);
   }
+
+  const onChangeChart = ()=>{
+    setHistorial(false)
+  }
+
+
 
   return (
     <>
@@ -87,11 +112,13 @@ export const Rank = () => {
             columnVisibilityModel={{id:false}}
             // sortModel={[{field:'fechaPartido'}]}
             localeText={esES.components.MuiDataGrid.defaultProps.localeText}
-            sx={{fontSize:16}}
+            sx={{fontSize:16,mb:1}}
           />
+          <Button color="secondary" sx={{color:'#56042c'}} variant="contained" fullWidth onClick={onChangeChart} endIcon={<BarChartIcon/> }>Ranking General</Button>
         </Box>
-        <Box component="div" sx={{alignItems:'center',width:{xs:'100vw',md:900},height:{xs:450,md:800},mt:1,pt:2}}>
-          {apostadores.length>0 && <Barras data={dataChart}></Barras>} 
+        <Box component="div" sx={{alignItems:'center',width:{xs:'100vw',md:900},height:{xs:450,md:800},mt:1,pt:{xs:8,md:2}}}>
+          {(apostadores.length>0 && !historial) && <Barras data={dataChart}></Barras>}
+          {historial && <Linea data={dataChartLine}></Linea>} 
         </Box>
     </Box>
     <Backdrop sx={{ color: 'primary.main', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={openSpinner}>

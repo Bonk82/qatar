@@ -41,7 +41,7 @@ export function AuthProvider({ children }) {
 
   const verRol = async (cu) =>{
     const usuarios = await listar('usuario')
-    console.log('verrol',usuarios,cu);
+    // console.log('verrol',usuarios,cu);
     const elUser = cu;
     if(cu){
       const usuario = usuarios.filter(f=>f.userID === cu?.uid)[0];
@@ -56,7 +56,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsubuscribe = onAuthStateChanged(auth, (currentUser) => {
-      console.log({ currentUser });
+      // console.log({ currentUser });
       // setUser(currentUser);
       verRol(currentUser);
       // setLoading(false);
